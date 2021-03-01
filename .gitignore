@@ -1,4 +1,4 @@
-/Volumes/External/Data/Q_Codes/*
+*
 !cmp.m
 !Master_Analyze_Executor.sh
 !Master_Prep_Executor.sh
@@ -17,7 +17,7 @@
 !ttsac.sh_mod
 !velo_vs_dist_mag4.txt
 !velo_vs_dist.txt
-/Volumes/External/Data/Q_Codes/ttimes/*
+ttimes/
 !remodl.f
 !setbrn.f
 !ttimes.f
