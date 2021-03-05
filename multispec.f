@@ -15,10 +15,11 @@ C
 	Dimension xnew(11000),ynew(11000)
 	Dimension xends(2),yends(2)
 C
-	Double Precision dfa
+C	Double Precision dfa
 C
 	Integer io
 	Integer julian
+	Integer kwave
 C
 	Character*1 ajunk
 	Character*4 kstnm, stn
@@ -188,8 +189,8 @@ C
 C
 		Rewind 3
 		Do 23 hold = 1,nlines2
-			Read(3,*) vratio, vs, stn
-C 51			Format(10x,f7.5,9x,f7.5,1x,a4)			
+			Read(3,51) vratio, vs, stn
+ 51			Format(10x,f7.5,9x,f7.5,1x,a4)			
 			If(stn .EQ. kstnm) Then
 				EXIT
 			End if
@@ -378,6 +379,7 @@ C
 C      PARAMETER (NMAX=10)
       DIMENSION XA(2),YA(2),C(10),D(10)
       SAVE
+	  N=2
       NS=1
       DIF=ABS(X-XA(1))
       DO 11 I=1,N
