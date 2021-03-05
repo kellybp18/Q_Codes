@@ -90,7 +90,7 @@ if %pick% eq yes
    message "Then pick SH wave window [bottom trace] - t3 for S wave begin"
    message "time, t4 for S wave minimum window length, and t5 for max"
    message "S wave window length."
-   message "Finally, pick pre-signal noise window -
+   message "Finally, pick pre-signal noise window -"
    message "type A to begin window, F to end it."
    message " "
    r $fh1 $fh2 ; rotate to gcp ; w sac radial.sv transv.sh
