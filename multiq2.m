@@ -132,7 +132,7 @@ sc echo "%elat% %elon% %edep% %emag% %evtnm%" > qs.out
 sc echo " " >> qs.out
 sc echo "%sname% %slat% %slon% %distkm% %gca% %azm% %bazm%" >> qs.out
 sc echo " " >> qs.out
-sc echo "     Qs           t*        sigma b       sigma m       chisq        begP         endP         begS         endS" >> qs.out
+sc echo "     Qs           t\*        sigma b       sigma m       chisq        begP         endP         begS         endS" >> qs.out
 *
 evaluate to Pinc (%Pmax - %Pmin) / 20.0 
 evaluate to Sinc (%Smax - %Smin) / 20.0
@@ -398,7 +398,7 @@ beginframe
 vspace full; xvport 0.05 0.95; yvport 0.1 0.9
 picks off; xlabel off; fileid off
 r ratio.sum
-setbb id "(substring 3 4 &1,nzyear& )(substring 2 4 (1000 + &1,nzjday&)) (before @( '&1,kzdate&' ) &1,kstnm& Mean Spectrum"
+setbb id "&1,kzdate& &1,kstnm& Mean Spectrum"
 plabel 1 on "%id%" p 0.28 0.85 size medium
 plabel 2 on "Mean P Amplitude Spectrum:" p 0.22 0.78 size small
 plabel 3 on "t0 %begP% t1 %Pmin% t2 %Pmax%" p 0.20 0.71 size tiny
@@ -441,12 +441,10 @@ pause
 *
 * Convert sgf files to .ps files
 *
-message "Working!"
 sc echo "%sname%" > temp.txt
 ls *.sgf >> temp.txt
 /Volumes/External/Data/Q_Codes/sgftops.sh
 sc rm *.sgf
-message "Working."
 *
 ****************************************************************
 * Clean up.
