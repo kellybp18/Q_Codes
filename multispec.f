@@ -189,8 +189,8 @@ C
 C
 		Rewind 3
 		Do 23 hold = 1,nlines2
-			Read(3,51) vratio, vs, stn
- 51			Format(10x,f7.5,9x,f7.5,1x,a4)			
+			Read(3,*) d, vratio, vp, vs, stn, elat, elon, edep
+C 51			Format(10x,f7.5,9x,f7.5,1x,a4)			
 			If(stn .EQ. kstnm) Then
 				EXIT
 			End if
