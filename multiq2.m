@@ -403,7 +403,7 @@ plabel 1 on "%id%" p 0.28 0.85 size medium
 plabel 2 on "Mean P Amplitude Spectrum:" p 0.22 0.78 size small
 plabel 3 on "t0 %begP% t1 %Pmin% t2 %Pmax%" p 0.20 0.71 size tiny
 plabel 4 on "Mean S Amplitude Spectrum:" p 0.55 0.78 size small
-plabel 5 on "t3 %begS% t4 %Smin% t5 %Smax%" p. 0.55 0.71 size tiny
+plabel 5 on "t3 %begS% t4 %Smin% t5 %Smax%" p 0.55 0.71 size tiny
 * vspace 1.0
 yvport 0.30 0.65
 xlim 0 20.0
