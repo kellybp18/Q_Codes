@@ -25,6 +25,7 @@ C
 	Character*2 ehr
 	Character*3 ajday,months,amonth
 	Character*4 ayr,stnm
+        Character*5 jdate
 	Character*6 ifile
 	Character*8 ofile
 	Character*10 ofile2
@@ -45,27 +46,26 @@ C       and includes the run output we want.
 C
 	Open(unit=1,file=ifile)
 C
-	Read(1,19,iostat = istat) elat,elon,edep,emag,iehr,
-     &       iemin,iesec,amonth,iday,jday,iyr
+	Read(1,*,iostat = istat) elat,elon,edep,emag,jdate
 C
 C	Write(6,19) elat,elon,edep,emag,iehr,iemin,iesec,
 C     &             amonth,iday,jday,iyr
 C
- 1      Format(G12.6,1x,G12.6,1x,G12.6,1x,G12.6,1x,a2,
-     &         i2,i2,1x,a3,1x,i2,2x,i3,3x,i4)
+C 1      Format(G12.6,1x,G12.6,1x,G12.6,1x,G12.6,1x,a2,
+C     &         i2,i2,1x,a3,1x,i2,2x,i3,3x,i4)
 C
- 19     Format(G12.6,1x,G12.6,1x,G12.6,1x,G12.6,1x,i2,
-     &         i2,i2,1x,a3,1x,i2,2x,i3,3x,i4)
+C 19     Format(G12.6,1x,G12.6,1x,G12.6,1x,G12.6,1x,i2,
+C     &         i2,i2,1x,a3,1x,i2,2x,i3,3x,i4)
 C
 	Read(1,99,iostat = istat) ajunk
 	Write(6,*) ajunk
  99     Format(a1)
 C
-        Read(1,2,iostat = istat) stnm,slat,slon,dist,gca,azm,bazm
-        Write(6,2) stnm,slat,slon,dist,gca,azm,bazm
+        Read(1,*,iostat = istat) stnm,slat,slon,dist,gca,azm,bazm
+        Write(6,*) stnm,slat,slon,dist,gca,azm,bazm
 C
- 2      Format(a4,1x,G12.6,1x,G12.6,1x,G12.6,1x,G12.6,1x,
-     &         G12.6,1x,G12.6)
+C 2      Format(a4,1x,G12.6,1x,G12.6,1x,G12.6,1x,G12.6,1x,
+C     &         G12.6,1x,G12.6)
 C
 	Read(1,99,iostat = istat) ajunk
 C	Write(6,*) ajunk
@@ -76,7 +76,7 @@ C
 C
         Do 3 I = 1,400
 C
-           Read (1,4,iostat = istat) qs(I),tstar(I),sigmab(I),sigmam(I),
+           Read (1,*,iostat = istat) qs(I),tstar(I),sigmab(I),sigmam(I),
      &                chisq(I),begP(I),endP(I),begS(I),endS(I)
 C
 c          Write (6,4) qs(I),tstar(I),sigmab(I),sigmam(I),
@@ -86,12 +86,12 @@ C
 C
  3      Continue
 C
- 4      Format(G12.6,1x,G12.6,1x,G12.6,1x,G12.6,1x,G12.6,
-     &         1x,G12.6,1x,G13.7,1x,G12.6,1x,G13.7)
+C 4      Format(G12.6,1x,G12.6,1x,G12.6,1x,G12.6,1x,G12.6,
+C     &         1x,G12.6,1x,G13.7,1x,G12.6,1x,G13.7)
 C
-        Read(1,5,iostat = istat) t7,t8,sqs,ststar
+        Read(1,*,iostat = istat) t7,t8,sqs,ststar
 C
- 5      Format(5x,G12.6,6x,G12.6,14x,G12.6,15x,G12.6)
+C 5      Format(5x,G12.6,6x,G12.6,14x,G12.6,15x,G12.6)
 C
 	Close(1)
 C
@@ -119,23 +119,22 @@ C
 C
         Open(unit = 3, file = ofile2)
 C
-        Write(3,7) elat,elon,edep,emag,imonth,iday,ayr,
-     &              iehr,iemin,iesec
+C        Write(3,7) elat,elon,edep,emag,imonth,ayr
 C
- 7      Format(f7.3,1x,f8.3,1x,f5.1,1x,f3.1,2x,i2.2,1x,
-     &         i2.2,1x,a4,1x,i2,':',i2.2,':',i2.2)
+C 7      Format(f7.3,1x,f8.3,1x,f5.1,1x,f3.1,2x,i2.2,1x,
+C     &         i2.2,1x,a4,1x,i2,':',i2.2,':',i2.2)
 C
         Write(3,*) ajunk
 C
-        Write(3,8) stnm,slat,slon,dist,gca,azm,bazm
+        Write(3,*) stnm,slat,slon,dist,gca,azm,bazm
 C
- 8      Format(a3,1x,f10.6,1x,f11.6,1x,f6.1,1x,f6.3,2x,
-     &         f5.1,1x,f5.1)
+C 8      Format(a3,1x,f10.6,1x,f11.6,1x,f6.1,1x,f6.3,2x,
+C     &         f5.1,1x,f5.1)
 C
-        Write(3,9) sqs,ststar,qave,qsdev,tave,tsdev
+        Write(3,*) sqs,ststar,qave,qsdev,tave,tsdev
 C
- 9      Format(f5.0,1x,f10.8,1x,f5.0,1x,f4.0,1x,f12.10,
-     &         1x,f12.10)
+C 9      Format(f5.0,1x,f10.8,1x,f5.0,1x,f4.0,1x,f12.10,
+C     &         1x,f12.10)
 C
         Close(3)
 C
@@ -159,8 +158,8 @@ C
         Open(unit = 2, file = ofile)
 C
         Write(2,*) 'Station: ',stnm
-        Write(2,*) 'Date: ',amonth,iday,ajday,ayr
-        Write(2,*) 'Origin: ',iehr,emin,esec
+        Write(2,*) 'Date: ',jdate,ajday,ayr
+        Write(2,*) 'Origin: ',emin,esec
         Write(2,10) 'Qs:'
         Write(2,11) 'Mean Qs = ',qave
         Write(2,11) 'Mean absolute deviation of Qs = ',qadev
