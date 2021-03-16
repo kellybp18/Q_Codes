@@ -201,13 +201,13 @@ do icountP from 1 to %Pnlast
 * After multispec produces the S/P spectral ratio file, we need to
 * pick the bounds of frequency that we'll be using in this set of
 * measurements for calculating the spectral slope (and t*, Qs).
-* This is done interactively ONCE, at the start of the measurements.
+* This is done interactively ONCE, at the start of the measurements.'
 *
       if $icountP eq 1
 *
          if $icountS eq 1
 *
-            message "Pick bounds of spectral slope - t7 for start t8 for end
+            message "Pick bounds of spectral slope - t7 for start t8 for end"
 *
             cut 0 40.0
             r /tmp/ratio.yy
@@ -346,7 +346,7 @@ do icountP from 1 to %Pnlast
 enddo
 *
 * If we're really done, find max value in the ratio.yy spectrum
-* run qsmean to get the final Qs values.
+* run qsmean to get the final Qs values.'
 *
 cut off
 r /tmp/ratio.yy
