@@ -165,7 +165,7 @@ do icountP from 1 to %Pnlast
    cut %begP %endcutP
    r $fz ; taper ; fft womean
    w sac P.spec ; w alpha P.spec.a 
-   w alpha /tmp/%sname%/$icountP$.Pspec.a
+*   w alpha /tmp/%sname%/$icountP$.Pspec.a
    ch iftype itime ; w sac /tmp/P.spec
 *
    do icountS from 1 to %Snlast
@@ -177,7 +177,7 @@ do icountP from 1 to %Pnlast
       cut %begS %endcutS
       r transv.sh ; taper ; fft womean
       w sac S.spec ; w alpha S.spec.a
-      w alpha /tmp/%sname%/$icountS$.Sspec.a
+*      w alpha /tmp/%sname%/$icountS$.Sspec.a
       ch iftype itime ; w sac /tmp/S.spec
 * 
       cut %noise1 %noise2
@@ -196,7 +196,7 @@ do icountP from 1 to %Pnlast
 *
       sc /Volumes/External/Data/Q_Codes/multispec
       r /tmp/ratio.yy
-      w alpha $icountP$.$icountS$.%sname%.asc
+*      w alpha $icountP$.$icountS$.%sname%.asc
 *
 * After multispec produces the S/P spectral ratio file, we need to
 * pick the bounds of frequency that we'll be using in this set of
