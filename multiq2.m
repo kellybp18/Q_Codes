@@ -196,7 +196,7 @@ do icountP from 1 to %Pnlast
 *
       sc /Volumes/External/Data/Q_Codes/multispec
       r /tmp/ratio.yy
-*      w alpha $icountP$.$icountS$.%sname%.asc
+      w alpha $icountP$.$icountS$.%sname%.asc
 *
 * After multispec produces the S/P spectral ratio file, we need to
 * pick the bounds of frequency that we'll be using in this set of
