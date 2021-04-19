@@ -320,7 +320,7 @@ C
 C
  39     Continue
 C
-	ntot = 1024 - 1
+	ntot = 1024
 C
 C	Calculate natural log of amplitude spectral ratio and write
 C	it to array yy.
