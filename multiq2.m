@@ -195,8 +195,8 @@ do icountP from 1 to %Pnlast
       sc echo "P.spec.a S.spec.a" >> /tmp/qcalc_drop
 *
       sc /Volumes/External/Data/Q_Codes/multispec
-      r /tmp/ratio.yy
-      w alpha $icountP$.$icountS$.%sname%.asc
+*     r /tmp/ratio.yy
+*     w alpha $icountP$.$icountS$.%sname%.asc
 *
 * After multispec produces the S/P spectral ratio file, we need to
 * pick the bounds of frequency that we'll be using in this set of
@@ -208,26 +208,18 @@ do icountP from 1 to %Pnlast
          if $icountS eq 1
 *
             message "Pick bounds of spectral slope - t7 for start t8 for end"
-*
             cut 0 40.0
             r /tmp/ratio.yy
             cut off
-            setbb begslope 3.0 ; setbb endslope 12.0
-            r /tmp/ratio.yy ; ch t7 %begslope t8 %endslope ; w sac /tmp/ratio.yy
 *
-*			if %pick% eq yes
+            if %pick% eq yes
+*            
+                  plotpk
 *
-*            	plotpk
+                  setbb begslope &1,t7& ; setbb endslope &1,t8&
+                  r /tmp/ratio.yy ; ch t7 %begslope t8 %endslope ; w /tmp/ratio.yy
 *
-*            	setbb begslope &1,t7& ; setbb endslope &1,t8&
-*            	r /tmp/ratio.yy ; ch t7 %begslope t8 %endslope ; w /tmp/ratio.yy
-*
-*			else
-*
-*			setbb begslope 4.0 ; setbb endslope 12.0
-*			r /tmp/ratio.yy ; ch t7 %begslope t8 %endslope ; w /tmp/ratio.yy
-*
-*			endif
+            endif
 *            
             bd x sgf
             xvport 0.1 0.9; yvport 0.15 0.8
