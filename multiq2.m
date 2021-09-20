@@ -208,6 +208,9 @@ do icountP from 1 to %Pnlast
          if $icountS eq 1
 *
             message "Pick bounds of spectral slope - t7 for start t8 for end"
+            r /tmp/ratio.yy; lp bu co 0.5 np 2 p 2; markptp length 48 to t0; w over
+            w alpha /tmp/ratio.spec
+*
             cut 0 40.0
             r /tmp/ratio.yy
             cut off
@@ -218,6 +221,13 @@ do icountP from 1 to %Pnlast
 *
                   setbb begslope &1,t7& ; setbb endslope &1,t8&
                   r /tmp/ratio.yy ; ch t7 %begslope t8 %endslope ; w /tmp/ratio.yy
+*
+            elseif %pick% eq no
+                  sc python /Volumes/External/Data/Q_Codes/linefit_algthm.py
+                  readtable /tmp/freq_picks.txt
+                  setbb begslope &1,DEPMIN& ; setbb endslope &1,DEPMAX&
+                  r /tmp/ratio.yy ; ch t7 %begslope t8 %endslope ; w sac /tmp/ratio.yy
+
 *
             endif
 *            
@@ -230,8 +240,16 @@ do icountP from 1 to %Pnlast
 *
          endif
 *
-         if $icountS ge 1
+         if $icountS gt 1
 *
+            r /tmp/ratio.yy ; lp bu co 0.5 np 2 p 2 ; markptp length 48 to t0 ; w over
+            w alpha /tmp/ratio.spec
+            if %pick% eq no
+                  sc python /Volumes/External/Data/Q_Codes/linefit_algthm.py
+                  readtable /tmp/freq_picks.txt
+                  setbb begslope &1,DEPMIN& ; setbb endslope &1,DEPMAX&
+*
+            endif
             r /tmp/ratio.yy ; ch t7 %begslope t8 %endslope ; w sac /tmp/ratio.yy
 *
          endif
@@ -242,6 +260,14 @@ do icountP from 1 to %Pnlast
 *
          if $icountS ge 1
 *
+            r /tmp/ratio.yy; lp bu co 0.5 np 2 p 2; markptp length 48 to t0; w over
+            w alpha /tmp/ratio.spec
+            if %pick% eq no
+                  sc python /Volumes/External/Data/Q_Codes/linefit_algthm.py
+                  readtable /tmp/freq_picks.txt
+                  setbb begslope &1,DEPMIN& ; setbb endslope &1,DEPMAX&
+*
+            endif
             r /tmp/ratio.yy ; ch t7 %begslope t8 %endslope ; w sac /tmp/ratio.yy
 *
          endif
