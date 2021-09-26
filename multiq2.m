@@ -341,6 +341,15 @@ do icountP from 1 to %Pnlast
 *
             r ratio.sum ; div %icount% ; w over
             sc cp ratio.sum /tmp/ratio.yy
+            r /tmp/ratio.yy ; markptp length 48 to t0 ; w alpha /tmp/ratio.spec
+*
+            if %pick% eq no
+                  sc python /Volumes/External/Data/Q_Codes/linefit_algthm.py
+                  readtable /tmp/freq_picks.txt
+                  setbb begslope &1,DEPMIN& ; setbb endslope &1,DEPMAX&
+*
+            endif
+            r /tmp/ratio.yy ; ch t7 %begslope t8 %endslope ; w sac /tmp/ratio.yy
 *
             r /tmp/P.spec.sum ; div %icount% ; w over
             r /tmp/S.spec.sum ; div %icount% ; w over                      
@@ -409,7 +418,7 @@ ylim all; p1
 *endif
 cut off
 endframe
-pause
+* pause
 * Panel 2:  
 message "P and S wave spectra"
 beginframe
@@ -435,7 +444,7 @@ xvport 0.55 0.80; line inc list 1 2; linlog; p2
 xlim off
 color off; linlin
 endframe
-pause 
+* pause 
 * Panel 3:  
 message "Log ratio of amplitude spectrum vs. frequency"
 beginframe
@@ -455,7 +464,7 @@ r ratio.sum /tmp/ratio.yl
 picks on T8 vertical T9 vertical 
 p2
 endframe
-pause
+* pause
 *
 * Convert sgf files to .ps files
 *
