@@ -40,7 +40,12 @@ def build_database():
         outfiles.remove('qsmean.out')
         stations = [file.replace('.out', '') for file in outfiles]
         for count,stn in enumerate(stations):
-            station_id = stn
+            if (stn == 'IL12') and (float(julian) < 16005):
+                station_id = 'IL01'
+            elif (stn == 'IL23') and (float(julian) < 16007):
+                station_id = 'IL17'
+            else:
+                station_id = stn
 
             ofilename = data_dir + '/' + stn + '.out'
             ofile = open(ofilename,'r')
@@ -91,7 +96,7 @@ def build_database():
                 odate = datetime.strptime(oyear + "-" + oday, "%Y-%j").strftime("%m-%d-%Y")
                 odate = str(odate) + " " + ohour + ":" + ominute + ":" + osec + '.' + omsec
             
-            if (abs(float(avg_qs) - float(sum_qs)) <= 100) and (float(std_qs) <= 100):
+            if (abs(float(avg_qs) - float(sum_qs)) <= 100) and (float(std_qs) <= 100) and (75 <= float(sum_qs) <= 1500) and (75 <= float(avg_qs) <= 1500):
                 judge = 'GOOD'
             else:
                 judge = 'BAD'
