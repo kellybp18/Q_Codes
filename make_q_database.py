@@ -65,21 +65,39 @@ def build_database():
             t_eight = get_q_info[3]
             sum_qs = get_q_info[6]
             sum_t_star = get_q_info[9]
+            get_all_q_lines = np.array([k.split(' ') for k in ofile_list[5:405]])
+            q_list = [float(x) for x in get_all_q_lines[:,0]]
+            t_list = [float(y) for y in get_all_q_lines[:,1]]
+            q1,q3 = np.percentile(q_list,[25,75])
+            iqr = q3 - q1
+            low_bound = q1 - 3.0*iqr
+            high_bound = q3 + 3.0*iqr
+            remove_outlier = 'NO'
+            for j,q_value in enumerate(q_list):
+                if (q_value < low_bound) or (q_value > high_bound):
+                    q_list[j] = np.nan
+                    t_list[j] = np.nan
+                    remove_outlier = 'YES'
             ofile.seek(0)
             ofile.close()
 
-            sfilename = data_dir + '/' + stn + '.stats'
-            sfile = open(sfilename,'r')
-            sfile_list = sfile.read().splitlines()
-            get_mean_qs = sfile_list[4:]
-            get_mean_qs_clean = [re.sub(' +',' ',s.strip()) for s in get_mean_qs]
-            avg_qs = get_mean_qs_clean[0].split(' ')[3]
-            std_qs = get_mean_qs_clean[2].split(' ')[5]
-            if std_qs == '**********':
-                std_qs = 'NaN'
-            avg_t_star = get_mean_qs_clean[7].split(' ')[3]
-            sfile.seek(0)
-            sfile.close()
+            if remove_outlier == 'YES':
+                avg_qs = np.nanmean(q_list)
+                std_qs = np.nanstd(q_list)
+                avg_t_star = np.nanmean(t_list)
+            elif remove_outlier == 'NO':
+                sfilename = data_dir + '/' + stn + '.stats'
+                sfile = open(sfilename,'r')
+                sfile_list = sfile.read().splitlines()
+                get_mean_qs = sfile_list[4:]
+                get_mean_qs_clean = [re.sub(' +',' ',s.strip()) for s in get_mean_qs]
+                avg_qs = get_mean_qs_clean[0].split(' ')[3]
+                std_qs = get_mean_qs_clean[2].split(' ')[5]
+                if std_qs == '**********':
+                    std_qs = 'NaN'
+                avg_t_star = get_mean_qs_clean[7].split(' ')[3]
+                sfile.seek(0)
+                sfile.close()
 
             if count == 0:
                 asc_filename = data_dir + '/' + stn + '.asc'
@@ -106,9 +124,9 @@ def build_database():
                                             'mean_qs':float(avg_qs),'mean_t_star':float(avg_t_star),'stdev_qs':float(std_qs), \
                                             't7':float(t_seven),'t8':float(t_eight),'judge_result':judge,'ev_lat':float(event_lat),'ev_lon':float(event_lon), \
                                             'ev_dep':float(event_dep),'stn_lat':float(station_lat),'stn_lon':float(station_lon), \
-                                            'azim':float(azimuth),'b_azim':float(back_azimuth),'ev_origin':odate,'ev_p_arrival':date}, \
-                                            ignore_index=True)
-    print(odate)
+                                            'azim':float(azimuth),'b_azim':float(back_azimuth),'ev_origin':odate,'ev_p_arrival':date, \
+                                            'outliers_removed':remove_outlier},ignore_index=True)
+    print(q_list)
     return q_database
 
 q_database = build_database()
