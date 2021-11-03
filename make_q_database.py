@@ -70,8 +70,8 @@ def build_database():
             t_list = [float(y) for y in get_all_q_lines[:,1]]
             q1,q3 = np.percentile(q_list,[25,75])
             iqr = q3 - q1
-            low_bound = q1 - 3.0*iqr
-            high_bound = q3 + 3.0*iqr
+            low_bound = q1 - 1.5*iqr
+            high_bound = q3 + 1.5*iqr
             remove_outlier = 'NO'
             for j,q_value in enumerate(q_list):
                 if (q_value < low_bound) or (q_value > high_bound):
@@ -114,7 +114,9 @@ def build_database():
                 odate = datetime.strptime(oyear + "-" + oday, "%Y-%j").strftime("%m-%d-%Y")
                 odate = str(odate) + " " + ohour + ":" + ominute + ":" + osec + '.' + omsec
             
-            if (abs(float(avg_qs) - float(sum_qs)) <= 100) and (float(std_qs) <= 100) and (75 <= float(sum_qs) <= 1500) and (75 <= float(avg_qs) <= 1500):
+            #if ((float(std_qs) <= 75) and (float(avg_qs) <= 300)) or ((float(std_qs) <= 75) and (float(avg_qs) <= 300))
+            
+            if (abs(float(avg_qs) - float(sum_qs)) <= float(std_qs)) and (float(std_qs) <= 0.15*float(avg_qs)) and (75 <= float(sum_qs) <= 1500) and (75 <= float(avg_qs) <= 1500):
                 judge = 'GOOD'
             else:
                 judge = 'BAD'
