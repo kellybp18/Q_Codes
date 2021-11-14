@@ -15,7 +15,8 @@ def build_database():
     q_database = pd.DataFrame({'ev_id':[],'stn_id':[],'mag':[],'stacked_qs':[],'stacked_t_star':[], \
                                'mean_qs':[],'mean_t_star':[],'stdev_qs':[],'t7':[],'t8':[],'judge_result':[], \
                                'ev_lat':[],'ev_lon':[],'ev_dep':[],'stn_lat':[],'stn_lon':[], \
-                               'azim':[],'b_azim':[],'ev_origin':[],'ev_p_arrival':[]})
+                               'azim':[],'b_azim':[],'ev_origin':[],'ev_wvfrm_start':[],'ev_p_arrival':[], \
+                               'ev_s_arrival':[],'outliers_removed':[]})
 
     event_dirs = open('/Volumes/External/Attenuation/event_directories.txt','r')
     events = event_dirs.read().splitlines()
@@ -60,6 +61,9 @@ def build_database():
             station_lon = get_stn_info[2]
             azimuth = get_stn_info[5]
             back_azimuth = get_stn_info[6]
+            get_p_and_s_arrivals = ofile_list[5].split(' ')
+            psec = get_p_and_s_arrivals[5] + 's'
+            ssec = get_p_and_s_arrivals[7] + 's'
             get_q_info = ofile_list[405].split(' ')
             t_seven = get_q_info[1]
             t_eight = get_q_info[3]
@@ -99,20 +103,20 @@ def build_database():
                 sfile.seek(0)
                 sfile.close()
 
-            if count == 0:
-                asc_filename = data_dir + '/' + stn + '.asc'
-                asc_file = open(asc_filename,'r')
-                asc_file_list = asc_file.read().splitlines()
-                get_origin = asc_file_list[14:16]
-                get_origin_clean = [re.sub(' +',' ',t.strip()) for t in get_origin]
-                oyear = get_origin_clean[0].split(' ')[0]
-                oday = get_origin_clean[0].split(' ')[1]
-                ohour = get_origin_clean[0].split(' ')[2]
-                ominute = get_origin_clean[0].split(' ')[3]
-                osec = get_origin_clean[0].split(' ')[4]
-                omsec = get_origin_clean[1].split(' ')[0]
-                odate = datetime.strptime(oyear + "-" + oday, "%Y-%j").strftime("%m-%d-%Y")
-                odate = str(odate) + " " + ohour + ":" + ominute + ":" + osec + '.' + omsec
+            
+            asc_filename = data_dir + '/' + stn + '.asc'
+            asc_file = open(asc_filename,'r')
+            asc_file_list = asc_file.read().splitlines()
+            get_origin = asc_file_list[14:16]
+            get_origin_clean = [re.sub(' +',' ',t.strip()) for t in get_origin]
+            wyear = get_origin_clean[0].split(' ')[0]
+            wday = get_origin_clean[0].split(' ')[1]
+            whour = get_origin_clean[0].split(' ')[2]
+            wminute = get_origin_clean[0].split(' ')[3]
+            wsec = get_origin_clean[0].split(' ')[4]
+            wmsec = get_origin_clean[1].split(' ')[0]
+            wdate = datetime.strptime(wyear + "-" + wday, "%Y-%j").strftime("%m-%d-%Y")
+            wdate = str(wdate) + " " + whour + ":" + wminute + ":" + wsec + '.' + wmsec
             
             #if ((float(std_qs) <= 75) and (float(avg_qs) <= 300)) or ((float(std_qs) <= 75) and (float(avg_qs) <= 300))
             
@@ -126,14 +130,17 @@ def build_database():
                                             'mean_qs':float(avg_qs),'mean_t_star':float(avg_t_star),'stdev_qs':float(std_qs), \
                                             't7':float(t_seven),'t8':float(t_eight),'judge_result':judge,'ev_lat':float(event_lat),'ev_lon':float(event_lon), \
                                             'ev_dep':float(event_dep),'stn_lat':float(station_lat),'stn_lon':float(station_lon), \
-                                            'azim':float(azimuth),'b_azim':float(back_azimuth),'ev_origin':odate,'ev_p_arrival':date, \
-                                            'outliers_removed':remove_outlier},ignore_index=True)
+                                            'azim':float(azimuth),'b_azim':float(back_azimuth),'ev_origin':date,'ev_wvfrm_start':wdate, \
+                                            'ev_p_arrival':psec,'ev_s_arrival':ssec,'outliers_removed':remove_outlier},ignore_index=True)
     print(q_list)
     return q_database
 
 q_database = build_database()
 q_database['ev_origin'] = pd.to_datetime(q_database['ev_origin'],format='%m-%d-%Y %H:%M:%S.%f')
-q_database['ev_p_arrival'] = pd.to_datetime(q_database['ev_p_arrival'],format='%m-%d-%Y %H:%M:%S.%f')
+q_database['ev_wvfrm_start'] = pd.to_datetime(q_database['ev_wvfrm_start'],format='%m-%d-%Y %H:%M:%S.%f')
+q_database['ev_p_arrival'] = q_database['ev_wvfrm_start'] + pd.to_timedelta(q_database['ev_p_arrival'])
+q_database['ev_s_arrival'] = q_database['ev_wvfrm_start'] + pd.to_timedelta(q_database['ev_s_arrival'])
+q_database.pop('ev_wvfrm_start')
 
 print(q_database.head(5))
 
