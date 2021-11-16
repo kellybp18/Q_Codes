@@ -13,7 +13,7 @@ def build_database():
     pairs and their statistical variables of interest."""
 
     q_database = pd.DataFrame({'ev_id':[],'stn_id':[],'mag':[],'stacked_qs':[],'stacked_t_star':[], \
-                               'mean_qs':[],'mean_t_star':[],'stdev_qs':[],'t7':[],'t8':[],'judge_result':[], \
+                               'mean_qs':[],'mean_t_star':[],'stdev_qs':[],'stdev_t_star':[],'t7':[],'t8':[],'judge_result':[], \
                                'ev_lat':[],'ev_lon':[],'ev_dep':[],'stn_lat':[],'stn_lon':[], \
                                'azim':[],'b_azim':[],'ev_origin':[],'ev_wvfrm_start':[],'ev_p_arrival':[], \
                                'ev_s_arrival':[],'outliers_removed':[]})
@@ -89,6 +89,7 @@ def build_database():
                 avg_qs = np.nanmean(q_list)
                 std_qs = np.nanstd(q_list)
                 avg_t_star = np.nanmean(t_list)
+                std_t_star = np.nanstd(t_list)
             elif remove_outlier == 'NO':
                 sfilename = data_dir + '/' + stn + '.stats'
                 sfile = open(sfilename,'r')
@@ -100,6 +101,9 @@ def build_database():
                 if std_qs == '**********':
                     std_qs = 'NaN'
                 avg_t_star = get_mean_qs_clean[7].split(' ')[3]
+                std_t_star = get_mean_qs_clean[9].split(' ')[5]
+                if std_t_star == '**********':
+                    std_t_star = 'NaN'
                 sfile.seek(0)
                 sfile.close()
 
@@ -127,7 +131,7 @@ def build_database():
             
             q_database = q_database.append({'ev_id':event_id,'stn_id':station_id,'mag':float(event_mag), \
                                             'stacked_qs':float(sum_qs),'stacked_t_star':float(sum_t_star), \
-                                            'mean_qs':float(avg_qs),'mean_t_star':float(avg_t_star),'stdev_qs':float(std_qs), \
+                                            'mean_qs':float(avg_qs),'mean_t_star':float(avg_t_star),'stdev_qs':float(std_qs),'stdev_t_star':float(std_t_star), \
                                             't7':float(t_seven),'t8':float(t_eight),'judge_result':judge,'ev_lat':float(event_lat),'ev_lon':float(event_lon), \
                                             'ev_dep':float(event_dep),'stn_lat':float(station_lat),'stn_lon':float(station_lon), \
                                             'azim':float(azimuth),'b_azim':float(back_azimuth),'ev_origin':date,'ev_wvfrm_start':wdate, \
