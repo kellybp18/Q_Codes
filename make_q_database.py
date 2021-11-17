@@ -140,6 +140,7 @@ def build_database():
     return q_database
 
 q_database = build_database()
+q_database = q_database[q_database['ev_dep'] >= 0.0]
 q_database['ev_origin'] = pd.to_datetime(q_database['ev_origin'],format='%m-%d-%Y %H:%M:%S.%f')
 q_database['ev_wvfrm_start'] = pd.to_datetime(q_database['ev_wvfrm_start'],format='%m-%d-%Y %H:%M:%S.%f')
 q_database['ev_p_arrival'] = q_database['ev_wvfrm_start'] + pd.to_timedelta(q_database['ev_p_arrival'])
