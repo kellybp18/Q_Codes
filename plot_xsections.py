@@ -109,7 +109,7 @@ for i in uniqlats:
                 interpolation='n')
     fig.basemap(projection='x4.0/0.06',
                 region=[lonmin,lonmax,depmax,depmin],
-                frame=['WSne','xa1f0.5+lLongitude','ya10f10+lDepth(km)'],
+                frame=['WSne','xa1f0.5+lLongitude','ya10f10+l"Depth (km)"'],
                 )
     fig.colorbar(frame=['xc/Volumes/External/Tomography/Figures/cbar_annots.txt+LQs'],
                  cmap='/Volumes/External/Tomography/Figures/qs.cpt',
@@ -149,7 +149,7 @@ for i in uniqlats:
                 interpolation='n')
     fig2.basemap(projection='x4.0/0.06',
                 region=[lonmin,lonmax,depmax,depmin],
-                frame=['WSne','xa1f1+lLongitude','ya10f5+lDepth(km)'],
+                frame=['WSne','xa1f1+lLongitude','ya10f5+l"Depth (km)"'],
                 )
     fig2.plot(x=topo_track['lon'],y=topo_track['dep']/1000,
                 projection='x4.0/0.06',
@@ -193,7 +193,7 @@ for i in uniqlats:
                 interpolation='n')    
     fig3.basemap(projection='x4.0/0.06',
                 region=[lonmin,lonmax,depmax,depmin],
-                frame=['WSne','xa1f1+lLongitude','ya10f5+lDepth(km)'],
+                frame=['WSne','xa1f1+lLongitude','ya10f5+l"Depth (km)"'],
                 )
     fig3.text(x=np.array(hitcount_data['lon']),
               y=np.array(hitcount_data['dep']),
