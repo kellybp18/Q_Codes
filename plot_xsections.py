@@ -111,7 +111,8 @@ for i in uniqlats:
                 region=[lonmin,lonmax,depmax,depmin],
                 frame=['WSne','xa1f0.5+lLongitude','ya10f10+lDepth(km)'],
                 )
-    fig.colorbar(cmap='/Volumes/External/Tomography/Figures/qs.cpt',
+    fig.colorbar(frame=['xc/Volumes/External/Tomography/Figures/cbar_annots.txt+LQs'],
+                 cmap='/Volumes/External/Tomography/Figures/qs.cpt',
                  position='JMR+o0.75c/0c+w7c/0.5c+n"No Data"')
     fig.savefig(('/Volumes/External/Tomography/Figures/'+str(lat_round)+'_slice.png'))
 
@@ -170,7 +171,8 @@ for i in uniqlats:
                 style='t0.2',
                 color='cyan',
                 pen='thin,black')
-    fig2.colorbar(cmap='/Volumes/External/Tomography/Figures/qs.cpt',
+    fig2.colorbar(frame=['xc/Volumes/External/Tomography/Figures/cbar_annots.txt+LQs'],
+                 cmap='/Volumes/External/Tomography/Figures/qs.cpt',
                  position='JMR+o0.75c/0c+w7c/0.5c')
     fig2.savefig(('/Volumes/External/Tomography/Figures/'+str(lat_round)+'_slice_surf.png'))
 
@@ -198,4 +200,6 @@ for i in uniqlats:
               text=np.array(np.array(hitcount_data['hitcount'],dtype=int),dtype=str),
               projection='x4.0/0.06',
               region=[lonmin,lonmax,depmax,depmin])
+    fig3.colorbar(frame=['x+l"Sum of Ray Distances in Box"','y+lkm'],
+                 position='JMR+o0.75c/0c+w7c/0.5c')
     fig3.savefig(('/Volumes/External/Tomography/Figures/'+str(lat_round)+'_hitcounts.png'))
