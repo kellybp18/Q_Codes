@@ -14,7 +14,7 @@ LAT_INT = LEN_LAT/Nblocks_lat
 LON_WEST = -73.0
 LON_EAST = -68.0
 LEN_LON = 5.0 # degrees
-Nblocks_lon = 23
+Nblocks_lon = 46
 LON_INT = LEN_LON/Nblocks_lon
 
 DEP_TOP = 0.0
@@ -690,6 +690,14 @@ coords = pd.read_csv('/Volumes/External/Tomography/coords.csv')
 #         continue
 
 # np.savetxt('/Volumes/External/Tomography/dist.txt',dist)
+print('GO')
+chunk = 0
+dist_pd = pd.DataFrame()
+for dist_tfr in pd.read_table('/Volumes/External/Tomography/dist.txt',sep=' ',header=None,chunksize=1000,iterator=True):
+    chunk = chunk + 1
+    dist_pd = pd.concat([dist_pd,dist_tfr],ignore_index=True)
+dist_pd.head()
+dist = dist_pd.to_numpy()
 dist = np.loadtxt('/Volumes/External/Tomography/dist.txt')
 
 # MAKE TRAVEL TIME ARRAY TT_SP
@@ -706,11 +714,18 @@ for i in range(NBLOCKS):
 
 # PERFORM INVERSION
 
+# Allocate space
+g_mod = np.zeros(((np.shape(CdI)[0]+(Nblocks_lat*Nblocks_lon*(Nblocks_dep-2))+((Nblocks_lat-2)*Nblocks_lon*Nblocks_dep)+(Nblocks_lat*(Nblocks_lon-2)*Nblocks_dep)),NBLOCKS),dtype=np.float32)
+g = g_mod[:np.shape(CdI)[0],:]
+dr = g_mod[np.shape(CdI)[0]:(np.shape(CdI)[0]+(Nblocks_lat*Nblocks_lon*(Nblocks_dep-2))),:]
+dtheta = g_mod[(np.shape(CdI)[0]+(Nblocks_lat*Nblocks_lon*(Nblocks_dep-2))):(np.shape(CdI)[0]+(Nblocks_lat*Nblocks_lon*(Nblocks_dep-2))+((Nblocks_lat-2)*Nblocks_lon*Nblocks_dep)),:]
+dphi = g_mod[(np.shape(CdI)[0]+(Nblocks_lat*Nblocks_lon*(Nblocks_dep-2))+((Nblocks_lat-2)*Nblocks_lon*Nblocks_dep)):,:]
+
 # Predicted data
 dpre = tt_sp@m0
 
 # Incorporate measurement reliability using inverse covariance
-g = CdI@tt_sp
+g[:,:] = CdI@tt_sp
 
 # Data perturbations weighted by inverse covariance
 ddt = CdI@(t_star - dpre)
@@ -731,7 +746,7 @@ wtPHI = 10000000
 
 # # Populate DR matrix
 # rown = 0
-# dr = np.zeros((Nblocks_lat*Nblocks_lon*(Nblocks_dep-2),NBLOCKS))
+# dr = np.zeros((Nblocks_lat*Nblocks_lon*(Nblocks_dep-2),NBLOCKS),dtype=np.float32)
 # for j in range(Nblocks_lat):
 #     for k in range(Nblocks_lon):
 #         for i in range(Nblocks_dep)[1:-1]:
@@ -741,13 +756,14 @@ wtPHI = 10000000
 #             dr[rown,indx[i,j,k]] = -2*facR
 #             dr[rown,indx[i+1,j,k]] = facR
 #             rown = rown + 1
+#             print('Working on row',rown,'out of',(Nblocks_lat*Nblocks_lon*(Nblocks_dep-2)))
 
-# np.savetxt('/Volumes/External/Tomography/dr.txt',dr)
-dr = np.loadtxt('/Volumes/External/Tomography/dr.txt')
+# #np.savetxt('/Volumes/External/Tomography/dr.txt',dr)
+# #dr = np.loadtxt('/Volumes/External/Tomography/dr.txt')
 
 # # Populate DTHETA matrix
 # rown = 0
-# dtheta = np.zeros(((Nblocks_lat-2)*Nblocks_lon*Nblocks_dep,NBLOCKS))
+# dtheta = np.zeros(((Nblocks_lat-2)*Nblocks_lon*Nblocks_dep,NBLOCKS),dtype=np.float32)
 # for k in range(Nblocks_lon):
 #     for i in range(Nblocks_dep):
 #         for j in range(Nblocks_lat)[1:-1]:
@@ -757,13 +773,14 @@ dr = np.loadtxt('/Volumes/External/Tomography/dr.txt')
 #             dtheta[rown,indx[i,j,k]] = -2*factheta
 #             dtheta[rown,indx[i,j+1,k]] = factheta
 #             rown = rown + 1
+#             print('Working on row',rown,'out of',((Nblocks_lat-2)*Nblocks_lon*Nblocks_dep))
 
-# np.savetxt('/Volumes/External/Tomography/dtheta.txt',dtheta)
-dtheta = np.loadtxt('/Volumes/External/Tomography/dtheta.txt')
+# #np.savetxt('/Volumes/External/Tomography/dtheta.txt',dtheta)
+# #dtheta = np.loadtxt('/Volumes/External/Tomography/dtheta.txt')
 
 # # Populate DPHI matrix
 # rown = 0
-# dphi = np.zeros((Nblocks_lat*(Nblocks_lon-2)*Nblocks_dep,NBLOCKS))
+# dphi = np.zeros((Nblocks_lat*(Nblocks_lon-2)*Nblocks_dep,NBLOCKS),dtype=np.float32)
 # for i in range(Nblocks_dep):
 #     for j in range(Nblocks_lat):
 #         for k in range(Nblocks_lon)[1:-1]:
@@ -773,48 +790,60 @@ dtheta = np.loadtxt('/Volumes/External/Tomography/dtheta.txt')
 #             dphi[rown,indx[i,j,k]] = -2*facphi
 #             dphi[rown,indx[i,j,k+1]] = facphi
 #             rown = rown + 1
+#             print('Working on row',rown,'out of',(Nblocks_lat*(Nblocks_lon-2)*Nblocks_dep))
 
-# np.savetxt('/Volumes/External/Tomography/dphi.txt',dphi)
-dphi = np.loadtxt('/Volumes/External/Tomography/dphi.txt')
+# #np.savetxt('/Volumes/External/Tomography/dphi.txt',dphi)
+# #dphi = np.loadtxt('/Volumes/External/Tomography/dphi.txt')
 
 ttsp2 = tt_sp
 
 # Create modified G matrix with roughening/smoothing
-g_mod = np.concatenate((g,dr,dtheta,dphi),axis=0)
+# g_mod = np.concatenate((g,dr,dtheta,dphi),axis=0)
 newrows = len(g_mod[:,0]) - len(g[:,0])
 
 # Pad data vector with zeros
 dmod = np.append(ddt,np.zeros(newrows))
 
-# Find columns of unsampled model parameters
-rmlist = np.array([],dtype=int)
-for col in range(len(g_mod[0,:])):
-    print('Working on column #',col+1,'out of',len(g_mod[0,:]))
-    for row in range(len(all_good_rays)):
-        elem = g_mod[row,col]
-        if elem != 0:
-            break
-        if row == len(all_good_rays)-1:
-            rmlist = np.append(rmlist,col)
+# # Find columns of unsampled model parameters
+# rmlist = np.array([],dtype=int)
+# for col in range(len(g_mod[0,:])):
+#     print('Working on column #',col+1,'out of',len(g_mod[0,:]))
+#     for row in range(len(all_good_rays)):
+#         elem = g_mod[row,col]
+#         if elem != 0:
+#             break
+#         if row == len(all_good_rays)-1:
+#             rmlist = np.append(rmlist,col)
 
-# GwoSMOOTH = g
+# # GwoSMOOTH = g
 
-# Remove unsampled columns from g_mod and m0_mod
-cols2rm = np.flip(rmlist)
-print(len(cols2rm))
+# # Remove unsampled columns from g_mod and m0_mod
+# cols2rm = np.flip(rmlist)
+# print(len(cols2rm))
 # m0_mod = m0
 # for column in cols2rm:
 #     print('Working on column #',column)
 #     g_mod = np.delete(g_mod,column,1)
+#     print('Worked')
 #     ttsp2 = np.delete(ttsp2,column,1)
 #     m0_mod = np.delete(m0_mod,column)
+
+# # print('Done')
 
 # np.savetxt('/Volumes/External/Tomography/g_mod.txt',g_mod)
 # np.savetxt('/Volumes/External/Tomography/ttsp2.txt',ttsp2)
 # np.savetxt('/Volumes/External/Tomography/m0_mod.txt',m0_mod)
+# np.savetxt('/Volumes/External/Tomography/rmlist.txt',rmlist)
 g_mod = np.loadtxt('/Volumes/External/Tomography/g_mod.txt')
 ttsp2 = np.loadtxt('/Volumes/External/Tomography/ttsp2.txt')
 m0_mod = np.loadtxt('/Volumes/External/Tomography/m0_mod.txt')
+rmlist = np.loadtxt('/Volumes/External/Tomography/rmlist.txt')
+cols2rm = np.flip(rmlist)
+
+print(np.shape(g_mod))
+print(np.nonzero(g_mod))
+print(np.count_nonzero(np.isnan(g_mod)))
+print(np.count_nonzero(np.isinf(g_mod)))
 
 # Using Menke nonneg method
 
@@ -828,6 +857,7 @@ for i,m_param in enumerate(m0_mod):
     h[i] = (1/Qmax) - m_param
 
 # SVD of g_mod
+#g_mod = g_mod.astype(np.float64)
 print('Starting svd')
 Up,Lp,Vp = linalg.svd(g_mod,full_matrices=False)
 print('Done with svd')
