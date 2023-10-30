@@ -7,14 +7,15 @@ import time
 map_coords = np.array([-73.0,-68.0,-34.0,-29.0])
 
 lonmin = -73.0
-lonmax = -68.0
+lonmax = -70.0
 depmin = 10
-depmax = -180
+depmax = -72
 
 q_database = pd.read_csv('/Volumes/External/Attenuation/q_database.csv')
 qs_model = pd.read_csv('/Volumes/External/Tomography/qs_model.csv')
 elev_data = pd.read_table('/Users/bpk/Documents/AGU_2021/Illapel_topo15.xyz',sep='\t',dtype=float,names=['lon','lat','elev'])
 stn_data = pd.read_table('/Users/bpk/Documents/BPK_Masters_2019/AGU_Fall_Meeting_2019/Illapel_Stns.gmt',sep=' ',dtype=float,usecols=[0,1,2],names=['lat','lon','elev'])
+qs_initial_model = np.loadtxt('/Volumes/External/Tomography/m0.txt')
 
 qs_model.loc[(qs_model['Qs'] > 0.0) & (qs_model['Qs'] < 75.0),'Qs'] = 75.0
 qs_model.loc[(qs_model['Qs'] > 1500.0),'Qs'] = 1500.0
@@ -37,19 +38,19 @@ surflonstep = round(lonstep/16,8)
 surfdepstep = round(depstep/16,8)
 print(surflonstep,surfdepstep)
 
-#hitcounts = pd.DataFrame({'boxnum':[],'hitcount':[],'total_ray_dist':[]})
-#
-#dist = np.loadtxt('/Volumes/External/Tomography/dist.txt')
-#
-#for j in range(len(dist[:,0])):
-#    blockdist = dist[j,:]
-#    nonzerodists = blockdist[np.nonzero(blockdist)]
-#    hitcount = len(nonzerodists)
-#    totaldist = np.sum(nonzerodists)
-#    hitcounts = hitcounts.append({'boxnum':j+1,'hitcount':hitcount,'total_ray_dist':totaldist},ignore_index=True)
-#
-#hitcounts.to_csv('/Volumes/External/Tomography/hitcounts.csv',index=False)
-hitcounts = pd.read_csv('/Volumes/External/Tomography/hitcounts.csv')
+hitcounts = pd.DataFrame({'boxnum':[],'hitcount':[],'total_ray_dist':[]})
+
+dist = np.loadtxt('/Volumes/External/Tomography/dist.txt')
+
+for j in range(len(dist[:,0])):
+   blockdist = dist[j,:]
+   nonzerodists = blockdist[np.nonzero(blockdist)]
+   hitcount = len(nonzerodists)
+   totaldist = np.sum(nonzerodists)
+   hitcounts = hitcounts.append({'boxnum':j+1,'hitcount':hitcount,'total_ray_dist':totaldist},ignore_index=True)
+
+hitcounts.to_csv('/Volumes/External/Tomography/hitcounts.csv',index=False)
+#hitcounts = pd.read_csv('/Volumes/External/Tomography/hitcounts.csv')
 
 os.system('cd /Volumes/External/Tomography/Figures')
 
@@ -63,6 +64,10 @@ for i in uniqlats:
     lat_round = np.round(i,2)
 
     latslice_boxnums = np.array(latslice['box_num'])
+    for lbox in latslice_boxnums:
+        if latslice.loc[int(lbox-1),'Qs'] == 0.0:
+            latslice.loc[int(lbox-1),'Qs'] = 1/(qs_initial_model[int(lbox-1)])
+
     hitcount_boxes = hitcounts.loc[latslice_boxnums-1,:]
     hitcount_data = pd.DataFrame(latslice.loc[:,['lon','dep']])
     hitcount_data = hitcount_data.join(hitcount_boxes)
