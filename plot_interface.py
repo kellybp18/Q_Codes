@@ -213,22 +213,22 @@ for t in np.array([[0,5],[6,10],[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],
                 below=[75,75.0])
     fig2.grdimage((data_dir + 'Figures/interfacesurfclip.grd'),
                 cmap=data_dir + 'Figures/qs_surf.cpt',
-                projection='x0.02/0.06',
+                projection='x0.03/0.075',
                 region=[-125.0,230.0,-80.0,-15.0],
                 interpolation='n')
     fig2.grdcontour(grid=(data_dir + 'Figures/interfacesurfclip.grd'),
                 interval=200,
                 annotation="400+f5p",
-                projection='x0.02/0.06',
+                projection='x0.03/0.075',
                 region=[-125.0,230.0,-80.0,-15.0],
                 pen='0.23,black')
-    fig2.basemap(projection='x0.02/0.06',
+    fig2.basemap(projection='x0.03/0.075',
                 region=[-125.0,230.0,-80.0,-15.0],
                 frame=['WSte','xa50f25+l"Distance Along Strike (km)"','ya10f5+l"Slab Depth (km)"'],
                 )
     fig2.plot(x=np.array([0.0]),
                 y=np.array([-31.0]),
-                projection='x0.02/0.06',
+                projection='x0.03/0.075',
                 region=[-125.0,230.0,-80.0,-15.0],
                 style='a0.3',
                 color='yellow',
@@ -241,19 +241,19 @@ for t in np.array([[0,5],[6,10],[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],
     #             )
     if t1 == -1 and t2 == -1:
         fig2.plot(data=(data_dir + 'Figures/okuwaki_rad_pattern/total_highmag_rad.csv'),
-                projection='x2.22/0.06',
+                projection='x3.33/0.075',
                 region=[-32.7,-29.5,-80.0,-15.0],
                 color='red',
                 transparency=50
                 )
         fig2.plot(data=(data_dir + 'Figures/okuwaki_rad_pattern/total_highmag_rad.csv'),
-                projection='x2.22/0.06',
+                projection='x3.33/0.075',
                 region=[-32.7,-29.5,-80.0,-15.0],
                 pen='0.5p,black',
                 )
         fig2.plot(x=np.array([0.0]),
                 y=np.array([-31.0]),
-                projection='x0.02/0.06',
+                projection='x0.03/0.075',
                 region=[-125.0,230.0,-80.0,-15.0],
                 style='a0.3',
                 color='yellow',
@@ -263,11 +263,11 @@ for t in np.array([[0,5],[6,10],[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],
         print('Do Nothing')
     else:
         fig2.plot(data=(data_dir + 'Figures/okuwaki_rad_pattern/'+str(t1) + '-' + str(t2) + '_sec.csv'),
-                    projection='x2.22/0.06',
+                    projection='x3.33/0.075',
                     region=[-32.7,-29.5,-80.0,-15.0],
                     pen='thick,white'
                     )
-    fig2.basemap(projection='x2.22/0.06',
+    fig2.basemap(projection='x3.33/0.075',
                 region=[-32.7,-29.5,-80.0,-15.0],
                 frame=['lbNr','xa1f0.5+l"Latitude (deg)"'])
     fig2.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots.txt+LQs'],
@@ -287,7 +287,7 @@ pygmt.grdclip((data_dir + 'Figures/interfacemasksurfmed.grd'),
             below=[75,75.0])
 fig3.grdimage((data_dir + 'Figures/interfacesurfclip.grd'),
             cmap=data_dir + 'Figures/qs_surf.cpt',
-            projection='x0.02/0.06',
+            projection='x0.03/0.075',
             region=[-125.0,230.0,-80.0,-15.0],
             interpolation='n')
 # fig3.grdcontour(grid=(data_dir + 'Figures/interfacesurfclip.grd'),
@@ -296,28 +296,28 @@ fig3.grdimage((data_dir + 'Figures/interfacesurfclip.grd'),
 #             projection='x0.02/0.06',
 #             region=[-125.0,250.0,-80.0,-15.0],
 #             pen='0.23,black')
-fig3.basemap(projection='x0.02/0.06',
+fig3.basemap(projection='x0.03/0.075',
             region=[-125.0,230.0,-80.0,-15.0],
             frame=['WSte','xa50f25+l"Distance Along Strike (km)"','ya10f5+l"Slab Depth (km)"'],
             )
-fig3.basemap(projection='x2.22/0.06',
+fig3.basemap(projection='x3.33/0.075',
             region=[-32.7,-29.5,-80.0,-15.0],
             frame=['lbNr','xa1f0.5+l"Latitude (deg)"'])
 fig3.plot(data=(data_dir + 'Figures/finite_fault/slip_contours.csv'),
-            projection='x0.02/0.06',
+            projection='x0.03/0.075',
             region=[-125.0,230.0,-80.0,-15.0],
             color='purple',
             transparency=80
             )
 fig3.contour(data=(data_dir + 'Figures/finite_fault/rake_and_slip_data.csv'),
-            projection='x0.02/0.06',
+            projection='x0.03/0.075',
             region=[-125.0,230.0,-80.0,-15.0],
             levels='0.2+0.2',
             pen='0.7p,purple',
             incols="0:1,3+d7.9833",
             )
 fig3.plot(data=(data_dir + 'Figures/finite_fault/rake_and_slip_data.csv'),
-            projection='x0.02/0.06',
+            projection='x0.03/0.075',
             region=[-125.0,230.0,-80.0,-15.0],
             style='v0.15c+e',
             pen='0.3p,black',
@@ -326,7 +326,7 @@ fig3.plot(data=(data_dir + 'Figures/finite_fault/rake_and_slip_data.csv'),
             )
 fig3.plot(x=np.array([0.0]),
             y=np.array([-31.0]),
-            projection='x0.02/0.06',
+            projection='x0.03/0.075',
             region=[-125.0,230.0,-80.0,-15.0],
             style='a0.3',
             color='yellow',
@@ -347,24 +347,24 @@ for idx,timestr in enumerate(time_file_strs):
                 below=[75,75.0])
     fig4.grdimage((data_dir + 'Figures/interfacesurfclip.grd'),
                 cmap=data_dir + 'Figures/qs_surf.cpt',
-                projection='x0.02/0.06',
+                projection='x0.03/0.075',
                 region=[-125.0,230.0,-80.0,-15.0],
                 interpolation='n')
     fig4.grdcontour(grid=(data_dir + 'Figures/interfacesurfclip.grd'),
                 interval=200,
                 annotation="400+f5p",
-                projection='x0.02/0.06',
+                projection='x0.03/0.075',
                 region=[-125.0,230.0,-80.0,-15.0],
                 pen='0.23,black')
-    fig4.basemap(projection='x0.02/0.06',
+    fig4.basemap(projection='x0.03/0.075',
                 region=[-125.0,230.0,-80.0,-15.0],
                 frame=['WSte','xa50f25+l"Distance Along Strike (km)"','ya10f5+l"Slab Depth (km)"'],
                 )
-    fig4.basemap(projection='x2.22/0.06',
+    fig4.basemap(projection='x3.33/0.075',
                 region=[-32.7,-29.5,-80.0,-15.0],
                 frame=['lbNr','xa1f0.5+l"Latitude (deg)"'])
     fig4.plot(data=(data_dir + 'Figures/interface_eqs' + timestr + '.csv'),
-                projection='x2.22/0.06',
+                projection='x3.33/0.075',
                 region=[-32.7,-29.5,-80.0,-15.0],
                 style='c0.1',
                 pen='0.2p,black',
@@ -372,7 +372,7 @@ for idx,timestr in enumerate(time_file_strs):
                 )
     fig4.plot(x=np.array([0.0]),
                 y=np.array([-31.0]),
-                projection='x0.02/0.06',
+                projection='x0.03/0.075',
                 region=[-125.0,230.0,-80.0,-15.0],
                 style='a0.3',
                 color='yellow',
