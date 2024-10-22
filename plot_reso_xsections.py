@@ -1,3 +1,11 @@
+# Code to plot the cross-section resolution test in GMT. For the high Q bar structure, set
+# qs_model = pd.read_csv(data_dir + 'qs_model_bar.csv') and 
+# qs_synth_model = np.concatenate(((1/300)*np.ones(6762),(1/900)*np.ones(11270),(1/300)*np.ones(72128))).
+#
+# For the low Q bar structure, set
+# qs_model = pd.read_csv(data_dir + 'qs_model_inverted_bar.csv') and
+# qs_synth_model = np.concatenate(((1/900)*np.ones(6762),(1/300)*np.ones(11270),(1/900)*np.ones(72128)))
+
 import numpy as np
 import pygmt
 import pandas as pd
@@ -13,11 +21,11 @@ depmin = 10
 depmax = -72
 
 q_database = pd.read_csv('/Volumes/External/Attenuation/q_database.csv')
-qs_model = pd.read_csv(data_dir + 'qs_model.csv')
+qs_model = pd.read_csv(data_dir + 'qs_model_inverted_bar.csv')
 elev_data = pd.read_table('/Users/bpk/Documents/AGU_2021/Illapel_topo15.xyz',sep='\t',dtype=float,names=['lon','lat','elev'])
 stn_data = pd.read_table('/Users/bpk/Documents/BPK_Masters_2019/AGU_Fall_Meeting_2019/Illapel_Stns.gmt',sep=' ',dtype=float,usecols=[0,1,2],names=['lat','lon','elev'])
-qs_initial_model = (1/600)*np.ones(90160)#np.loadtxt(data_dir + 'm0_mod.txt')
-qs_synth_model = np.loadtxt(data_dir + 'm0_synth.txt')
+qs_initial_model = (1/450)*np.ones(90160)#np.loadtxt(data_dir + 'm0_mod.txt')
+qs_synth_model = np.concatenate(((1/900)*np.ones(6762),(1/300)*np.ones(11270),(1/900)*np.ones(72128))) #np.loadtxt(data_dir + 'm0_synth.txt')
 
 qs_model.loc[(qs_model['Qs'] > 0.0) & (qs_model['Qs'] < 75.0),'Qs'] = 75.0
 qs_model.loc[(qs_model['Qs'] > 1500.0),'Qs'] = 1500.0
@@ -65,6 +73,16 @@ for i in uniqlats:
     currentqmin = np.min(latslice['Qs'])
     lat_round = np.round(i,2)
 
+    mask_data = pd.DataFrame(latslice.loc[:,['lon','dep','Qs']])
+    mask_data.to_csv((data_dir + 'Figures/maskgrid_'+str(lat_round)+'.xyz'),header=None,index=None,sep=' ',mode='w')
+
+    os.system(('gmt blockmean ' + data_dir + 'Figures/maskgrid_'+str(lat_round)+'.xyz -R-73/-68/-180/0 -I'+str(surflonstep)+'/'+str(surfdepstep)+' > ' + data_dir + 'Figures/maskgridmed_'+str(lat_round)+'.xyz'))
+    time.sleep(3)
+    os.system(('gmt surface ' + data_dir + 'Figures/maskgridmed_'+str(lat_round)+'.xyz -G' + data_dir + 'Figures/maskgridmed_'+str(lat_round)+'.grd -I'+str(surflonstep)+'/'+str(surfdepstep)+' -Lu1500.0 -R-73/-68/-180/0 -Tb1i0'))
+    time.sleep(5)
+    os.system(('gmt grdclip ' + data_dir + 'Figures/maskgridmed_'+str(lat_round)+'.grd -G' + data_dir + 'Figures/maskgridclip_'+str(lat_round)+'.grd -Sb75.0/NaN'))
+    time.sleep(5)
+
     latslice_boxnums = np.array(latslice['box_num'])
     for lbox in latslice_boxnums:
         if latslice.loc[int(lbox-1),'Qs'] == 0.0:
@@ -92,6 +110,8 @@ for i in uniqlats:
     time.sleep(3)
     os.system(('gmt surface ' + data_dir + 'Figures/surfgridmed_'+str(lat_round)+'.xyz -G' + data_dir + 'Figures/surfgridmed_'+str(lat_round)+'.grd -I'+str(surflonstep)+'/'+str(surfdepstep)+' -Lu1500.0 -R-73/-68/-180/0 -Tb1i0'))
     time.sleep(5)
+    os.system(('gmt grdmath ' + data_dir + 'Figures/surfgridmed_'+str(lat_round)+'.grd ' + data_dir + 'Figures/maskgridclip_'+str(lat_round)+'.grd OR = ' + data_dir + 'Figures/surfmaskgridmed_'+str(lat_round)+'.grd'))
+    time.sleep(3)
     print("Okay")
 
     fig = pygmt.Figure()
@@ -101,9 +121,9 @@ for i in uniqlats:
                 outgrid = (data_dir + 'Figures/Q_'+str(lat_round)+'.grd'),
                 region=[uniqlons[0],uniqlons[-1],uniqdeps[0],uniqdeps[-1]],
                 spacing=(str(lonstep)+'+e/'+str(depstep)+'+e'))
-    pygmt.grdclip((data_dir + 'Figures/surfgridmed_'+str(lat_round)+'.grd'),
+    pygmt.grdclip((data_dir + 'Figures/surfmaskgridmed_'+str(lat_round)+'.grd'),
                 outgrid=(data_dir + 'Figures/surfgridclip_'+str(lat_round)+'.grd'),
-                below=[75,np.nan])
+                below=[75,75.0])
     #pygmt.config(COLOR_NAN='white')
     #pygmt.makecpt(cmap='seis',
     #            series=[q_min,q_max,q_inc],
@@ -155,8 +175,8 @@ for i in uniqlats:
                 region=[lonmin,lonmax,depmax,depmin],
                 interpolation='n')
     fig2.grdcontour(grid=(data_dir + 'Figures/surfgridclip_'+str(lat_round)+'.grd'),
-                interval=100,
-                annotation=200,
+                interval=200,
+                annotation='400+f5p',
                 projection='x4.0/0.06',
                 region=[lonmin,lonmax,depmax,depmin])
     fig2.basemap(projection='x4.0/0.06',
@@ -185,7 +205,7 @@ for i in uniqlats:
                 pen='thin,black')
     fig2.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots.txt+LQs'],
                  cmap=data_dir + 'Figures/qs.cpt',
-                 position='JMR+o0.75c/0c+w7c/0.5c')
+                 position='JMR+o0.5c/0c+w4.92c/0.4c+n"No Data"')
     fig2.savefig((data_dir + 'Figures/'+str(lat_round)+'_slice_surf.png'))
 
     fig3 = pygmt.Figure()
@@ -234,5 +254,5 @@ for i in uniqlats:
                 )
     fig4.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots.txt+LQs'],
                  cmap=data_dir + 'Figures/qs.cpt',
-                 position='JMR+o0.75c/0c+w7c/0.5c+n"No Data"')
+                 position='JMR+o0.5c/0c+w4.92c/0.4c+n"No Data"')
     fig4.savefig((data_dir + 'Figures/'+str(lat_round)+'synth_slice.png'))
