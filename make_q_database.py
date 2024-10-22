@@ -1,6 +1,14 @@
 # Reads in data from all event folders in /Volumes/External/Attenuation
 # for each event-station pair, placing all necessary information such as
 # Q, t*, locations, times, magnitude, etc.
+#
+# NOTE: 4 rays have GOOD result judgements, but have been manually set
+# to BAD because their .gmt files are empty (trabox didn't converge).
+# Therefore, DO NOT RUN this program to remake the q_database unless
+# absolutely necessary. E222-IL12, E126-IL04, E179-IL16, E21-IL13,
+# E229-IL04, E401-IL07, E429-IL04, E488-IL07, E508-IL01 did not
+# converge with TRABOX. If not already labeled 'BAD', mark them
+# 'BAD' manually.
 
 import numpy as np
 import pandas as pd
@@ -16,7 +24,7 @@ def build_database():
                                'mean_qs':[],'mean_t_star':[],'stdev_qs':[],'stdev_t_star':[],'t7':[],'t8':[],'judge_result':[], \
                                'ev_lat':[],'ev_lon':[],'ev_dep':[],'stn_lat':[],'stn_lon':[], \
                                'azim':[],'b_azim':[],'ev_origin':[],'ev_wvfrm_start':[],'ev_p_arrival':[], \
-                               'ev_s_arrival':[],'outliers_removed':[]})
+                               'ev_s_arrival':[],'outliers_removed':[],'max_amp':[]})
 
     event_dirs = open('/Volumes/External/Attenuation/event_directories.txt','r')
     events = event_dirs.read().splitlines()
@@ -111,6 +119,9 @@ def build_database():
             asc_filename = data_dir + '/' + stn + '.asc'
             asc_file = open(asc_filename,'r')
             asc_file_list = asc_file.read().splitlines()
+            get_ptpamp = asc_file_list[0].split(' ')
+            get_ptpamp_clean = list(filter(('').__ne__,get_ptpamp))
+            ptpamp = get_ptpamp_clean[2]
             get_origin = asc_file_list[14:16]
             get_origin_clean = [re.sub(' +',' ',t.strip()) for t in get_origin]
             wyear = get_origin_clean[0].split(' ')[0]
@@ -135,7 +146,7 @@ def build_database():
                                             't7':float(t_seven),'t8':float(t_eight),'judge_result':judge,'ev_lat':float(event_lat),'ev_lon':float(event_lon), \
                                             'ev_dep':float(event_dep),'stn_lat':float(station_lat),'stn_lon':float(station_lon), \
                                             'azim':float(azimuth),'b_azim':float(back_azimuth),'ev_origin':date,'ev_wvfrm_start':wdate, \
-                                            'ev_p_arrival':psec,'ev_s_arrival':ssec,'outliers_removed':remove_outlier},ignore_index=True)
+                                            'ev_p_arrival':psec,'ev_s_arrival':ssec,'outliers_removed':remove_outlier,'max_amp':float(ptpamp)},ignore_index=True)
     print(q_list)
     return q_database
 
