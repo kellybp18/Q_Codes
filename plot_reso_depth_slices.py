@@ -1,10 +1,10 @@
-# Code to plot the depth-slice resolution test in GMT. For the high Q bar structure, set
-# qs_model = pd.read_csv(data_dir + 'qs_model_bar.csv') and 
-# qs_synth_model = np.concatenate(((1/300)*np.ones(6762),(1/900)*np.ones(11270),(1/300)*np.ones(72128))).
+# Code to plot the depth-slice resolution test in GMT. 
+# 
+# For the high Q bar structure, set
+# structure = 'bar'
 #
 # For the low Q bar structure, set
-# qs_model = pd.read_csv(data_dir + 'qs_model_inverted_bar.csv') and
-# qs_synth_model = np.concatenate(((1/900)*np.ones(6762),(1/300)*np.ones(11270),(1/900)*np.ones(72128)))
+# structure = 'inverted_bar'
 
 import numpy as np
 import pygmt
@@ -14,6 +14,7 @@ import time
 
 map_coords = np.array([-73.0,-68.0,-34.0,-29.0])
 data_dir = '/Volumes/External/Resolution_Tests/Latbox_49_Lonbox_46_Depbox_40/'
+structure = 'inverted_bar'
 
 lonmin = -73.0
 lonmax = -69.0
@@ -23,11 +24,20 @@ depmin = 10
 depmax = -72
 
 q_database = pd.read_csv('/Volumes/External/Attenuation/q_database.csv')
-qs_model = pd.read_csv(data_dir + 'qs_model_inverted_bar.csv')
 elev_data = pd.read_table('/Users/bpk/Documents/AGU_2021/Illapel_topo15.xyz',sep='\t',dtype=float,names=['lon','lat','elev'])
 stn_data = pd.read_table('/Users/bpk/Documents/BPK_Masters_2019/AGU_Fall_Meeting_2019/Illapel_Stns.gmt',sep=' ',dtype=float,usecols=[0,1,2],names=['lat','lon','elev'])
 qs_initial_model = (1/450)*np.ones(90160)#np.loadtxt(data_dir + 'm0_mod.txt')
-qs_synth_model = np.concatenate(((1/900)*np.ones(6762),(1/300)*np.ones(11270),(1/900)*np.ones(72128)))#np.loadtxt(data_dir + 'm0_synth_new.txt') 
+
+if structure == 'inverted_bar':
+    bar_qs = 300
+    else_qs = 900
+elif structure == 'bar':
+    bar_qs = 900
+    else_qs = 300
+else:
+    raise ValueError('"structure" variable must equal "inverted_bar" or "bar".')
+qs_model = pd.read_csv(data_dir + 'qs_model_' + structure + '.csv')
+qs_synth_model = np.concatenate(((1/else_qs)*np.ones(6762),(1/bar_qs)*np.ones(11270),(1/else_qs)*np.ones(72128)))#np.loadtxt(data_dir + 'm0_synth_new.txt')
 
 qs_model.loc[(qs_model['Qs'] > 0.0) & (qs_model['Qs'] < 75.0),'Qs'] = 75.0
 qs_model.loc[(qs_model['Qs'] > 1500.0),'Qs'] = 1500.0
@@ -254,3 +264,49 @@ for i in uniqdeps:
                  cmap=data_dir + 'Figures/qs.cpt',
                  position='JMR+o0.75c/0c+w7c/0.5c+n"No Data"')
     fig4.savefig((data_dir + 'Figures/dep_'+str(dep_round)+'synth_slice.png'))
+
+    # Create ratio plots between recovered Q and synthetic Q structure
+
+    if dep_round > -13.5 or dep_round < -36.0:
+        os.system(('gmt grdmath ' + data_dir + 'Figures/surfdepgridclip_'+str(dep_round)+'.grd ' + str(else_qs) + ' DIV = ' + data_dir + 'Figures/depratio_'+str(dep_round)+'.grd'))
+        time.sleep(3)
+    else:
+        os.system(('gmt grdmath ' + data_dir + 'Figures/surfdepgridclip_'+str(dep_round)+'.grd ' + str(bar_qs) + ' DIV = ' + data_dir + 'Figures/depratio_'+str(dep_round)+'.grd'))
+        time.sleep(3)
+
+    fig5 = pygmt.Figure()
+    fig5.grdimage((data_dir + 'Figures/depratio_'+str(dep_round)+'.grd'),
+                cmap=data_dir + 'Figures/qs_ratio.cpt',
+                projection='m3.5',
+                region=[lonmin,lonmax,latmin,latmax],
+                interpolation='n')
+    fig5.grdcontour(grid=(data_dir + 'Figures/depratio_'+str(dep_round)+'.grd'),
+                interval=data_dir + 'Figures/qs_ratio.cpt',
+                projection='m3.5c',
+                region=[lonmin,lonmax,latmin,latmax])
+    fig5.basemap(projection='m3.5',
+                region=[lonmin,lonmax,latmin,latmax],
+                frame=['WSNe','a1f0.5'],
+                )
+    fig5.coast(projection='m3.5c',
+              region=[lonmin,lonmax,latmin,latmax],
+              borders='1/thick,black',
+              shorelines='thick,black',
+              )
+    fig5.plot(data='/Users/bpk/Documents/BPK_Masters_2019/AGU_Fall_Meeting_2019/Illapel_Stns.gmt',
+              projection='m3.5c',
+              region=[lonmin,lonmax,latmin,latmax],
+              style='d0.4',
+              color='white',
+              pen='thin,black',
+              incols=[1,0])
+    fig5.plot(data='/Volumes/External/Tomography/Figures/chile_offshore_faults/trench_coords.txt',
+              projection='m3.5c',
+              region=[lonmin,lonmax,latmin,latmax],
+              pen='1.3p,black',
+              style='f1.4c/0.3c+l+t+p',
+              color='black')
+    fig5.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots_ratio.txt+L"Qs Ratio"'],
+                 cmap=data_dir + 'Figures/qs_ratio.cpt',
+                 position='JMR+o0.75c/0c+w7c/0.5c+e+n"No Data"')
+    fig5.savefig((data_dir + 'Figures/depratio_'+str(dep_round)+'.png'))
