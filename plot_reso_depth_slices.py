@@ -14,7 +14,7 @@ import time
 
 map_coords = np.array([-73.0,-68.0,-34.0,-29.0])
 data_dir = '/Volumes/External/Resolution_Tests/Latbox_49_Lonbox_46_Depbox_40/'
-structure = 'inverted_bar'
+structure = 'bar'
 
 lonmin = -73.0
 lonmax = -69.0
