@@ -1,10 +1,10 @@
-# Code to plot the cross-section resolution test in GMT. For the high Q bar structure, set
-# qs_model = pd.read_csv(data_dir + 'qs_model_bar.csv') and 
-# qs_synth_model = np.concatenate(((1/300)*np.ones(6762),(1/900)*np.ones(11270),(1/300)*np.ones(72128))).
+# Code to plot the cross-section resolution test in GMT.
+# 
+# For the high Q bar structure, set
+# structure = 'bar'
 #
 # For the low Q bar structure, set
-# qs_model = pd.read_csv(data_dir + 'qs_model_inverted_bar.csv') and
-# qs_synth_model = np.concatenate(((1/900)*np.ones(6762),(1/300)*np.ones(11270),(1/900)*np.ones(72128)))
+# structure = 'inverted_bar'
 
 import numpy as np
 import pygmt
@@ -14,6 +14,7 @@ import time
 
 map_coords = np.array([-73.0,-68.0,-34.0,-29.0])
 data_dir = '/Volumes/External/Resolution_Tests/Latbox_49_Lonbox_46_Depbox_40/'
+structure = 'bar'
 
 lonmin = -73.0
 lonmax = -70.0
@@ -21,10 +22,19 @@ depmin = 10
 depmax = -72
 
 q_database = pd.read_csv('/Volumes/External/Attenuation/q_database.csv')
-qs_model = pd.read_csv(data_dir + 'qs_model_inverted_bar.csv')
 elev_data = pd.read_table('/Users/bpk/Documents/AGU_2021/Illapel_topo15.xyz',sep='\t',dtype=float,names=['lon','lat','elev'])
 stn_data = pd.read_table('/Users/bpk/Documents/BPK_Masters_2019/AGU_Fall_Meeting_2019/Illapel_Stns.gmt',sep=' ',dtype=float,usecols=[0,1,2],names=['lat','lon','elev'])
 qs_initial_model = (1/450)*np.ones(90160)#np.loadtxt(data_dir + 'm0_mod.txt')
+
+if structure == 'inverted_bar':
+    bar_qs = 300
+    else_qs = 900
+elif structure == 'bar':
+    bar_qs = 900
+    else_qs = 300
+else:
+    raise ValueError('"structure" variable must equal "inverted_bar" or "bar".')
+qs_model = pd.read_csv(data_dir + 'qs_model_' + structure + '.csv')
 qs_synth_model = np.concatenate(((1/900)*np.ones(6762),(1/300)*np.ones(11270),(1/900)*np.ones(72128))) #np.loadtxt(data_dir + 'm0_synth.txt')
 
 qs_model.loc[(qs_model['Qs'] > 0.0) & (qs_model['Qs'] < 75.0),'Qs'] = 75.0
@@ -256,3 +266,49 @@ for i in uniqlats:
                  cmap=data_dir + 'Figures/qs.cpt',
                  position='JMR+o0.5c/0c+w4.92c/0.4c+n"No Data"')
     fig4.savefig((data_dir + 'Figures/'+str(lat_round)+'synth_slice.png'))
+
+    # Create ratio plots between recovered Q and synthetic Q structure
+
+    os.system(('gmt grdmath Y -15.75 GT Y -38.25 LT ADD ' + data_dir + 'Figures/surfgridclip_' + str(lat_round) + '.grd MUL ' + str(else_qs) + ' DIV Y -15.75 LE Y -38.25 GE MUL '\
+            + data_dir + 'Figures/surfgridclip_' + str(lat_round) + '.grd MUL ' + str(bar_qs) + ' DIV ADD = ' + data_dir + 'Figures/lat_ratio_' + str(lat_round) + '.grd'))
+    time.sleep(5)
+
+    fig5 = pygmt.Figure()
+    fig5.grdimage((data_dir + 'Figures/lat_ratio_' + str(lat_round) + '.grd'),
+                projection='x4.0/0.06',
+                cmap=data_dir + 'Figures/qs_ratio.cpt',
+                region=[lonmin,lonmax,depmax,depmin],
+                interpolation='n')
+    fig5.grdcontour(grid=(data_dir + 'Figures/lat_ratio_' + str(lat_round) + '.grd'),
+                interval=data_dir + 'Figures/qs_ratio.cpt',
+                annotation='0.25+f7p',
+                projection='x4.0/0.06',
+                region=[lonmin,lonmax,depmax,depmin])
+    fig5.basemap(projection='x4.0/0.06',
+                region=[lonmin,lonmax,depmax,depmin],
+                frame=['WSne','xa1f1+lLongitude','ya10f5+l"Depth (km)"'],
+                )
+    fig5.plot(x=topo_track['lon'],y=topo_track['dep']/1000,
+                projection='x4.0/0.06',
+                region=[lonmin,lonmax,depmax,depmin],
+                pen='thick,darkbrown')
+    fig5.plot(x=slab['lon'],y=slab['dep'],
+                projection='x4.0/0.06',
+                region=[lonmin,lonmax,depmax,depmin],
+                pen='thick,black')
+    fig5.plot(x=np.array(eqs['ev_lon'],dtype=float),y=np.array(-1*eqs['ev_dep'],dtype=float),
+                projection='x4.0/0.06',
+                region=[lonmin,lonmax,depmax,depmin],
+                style='c0.1',
+                color='white',
+                pen='thin,black')
+    fig5.plot(x=np.array(stn_data['lon'],dtype=float),y=np.array(-1*stn_data['elev'],dtype=float),
+                projection='x4.0/0.06',
+                region=[lonmin,lonmax,depmax,depmin],
+                style='t0.2',
+                color='cyan',
+                pen='thin,black')
+    fig5.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots_ratio.txt+L"Qs Ratio"'],
+                    cmap=data_dir + 'Figures/qs_ratio.cpt',
+                    position='JMR+o0.5c/0c+w4.92c/0.4c+e+n"No Data"')
+    fig5.savefig((data_dir + 'Figures/lat_ratio_' + str(lat_round) + '.png'))
