@@ -1,10 +1,10 @@
-# Code to plot the slab interface resolution test in GMT. For the high Q bar structure, set
-# qs_model = pd.read_csv(data_dir + 'qs_model_bar.csv') and 
-# qs_synth_model = np.concatenate(((1/300)*np.ones(6762),(1/900)*np.ones(11270),(1/300)*np.ones(72128))).
+# Code to plot the slab interface resolution test in GMT. 
+# 
+# For the high Q bar structure, set
+# structure = 'bar'
 #
 # For the low Q bar structure, set
-# qs_model = pd.read_csv(data_dir + 'qs_model_inverted_bar.csv') and
-# qs_synth_model = np.concatenate(((1/900)*np.ones(6762),(1/300)*np.ones(11270),(1/900)*np.ones(72128)))
+# structure = 'inverted_bar'
 
 import numpy as np
 import pygmt
@@ -14,6 +14,7 @@ import time
 
 map_coords = np.array([-73.0,-68.0,-34.0,-29.0])
 data_dir = '/Volumes/External/Resolution_Tests/Latbox_49_Lonbox_46_Depbox_40/'
+structure = 'bar'
 
 # Set up area
 latmin = -33.0
@@ -29,11 +30,20 @@ main_shock_lat = -31.57
 main_shock_dep = -20.7
 
 # Read in necessary files
-qs_model = pd.read_csv(data_dir + 'qs_model_inverted_bar.csv')
 slab_contours = pd.read_csv(data_dir + 'Figures/interface_contours.csv',sep=',',names=['lon','lat','dep'])
 eq_database = pd.read_csv('/Volumes/External/Attenuation/q_database.csv')
 qs_initial = 450.0
-qs_synth_model = np.concatenate(((1/900)*np.ones(6762),(1/300)*np.ones(11270),(1/900)*np.ones(72128))) #np.loadtxt(data_dir + 'm0_synth.txt')
+
+if structure == 'inverted_bar':
+    bar_qs = 300
+    else_qs = 900
+elif structure == 'bar':
+    bar_qs = 900
+    else_qs = 300
+else:
+    raise ValueError('"structure" variable must equal "inverted_bar" or "bar".')
+qs_model = pd.read_csv(data_dir + 'qs_model_' + structure + '.csv')
+qs_synth_model = np.concatenate(((1/else_qs)*np.ones(6762),(1/bar_qs)*np.ones(11270),(1/else_qs)*np.ones(72128)))#np.loadtxt(data_dir + 'm0_synth_new.txt')
 
 # Find boxes directly above each point along each depth contour
 # from 0 - 80 km depth, save their Qs value, and calculate distance along
@@ -149,3 +159,33 @@ fig4.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots.txt+LQs'],
                 cmap=data_dir + 'Figures/qs.cpt',
                 position='JMR+o0.5c/0c+w4.92c/0.4c+n"No Data"')
 fig4.savefig((data_dir + 'Figures/interface_synth_slice.png'))
+
+# Create ratio plots between recovered Q and synthetic Q structure
+
+os.system(('gmt grdmath Y -15.75 GT Y -38.25 LT ADD ' + data_dir + 'Figures/interfacesurfclip.grd MUL ' + str(else_qs) + ' DIV Y -15.75 LE Y -38.25 GE MUL '\
+           + data_dir + 'Figures/interfacesurfclip.grd MUL ' + str(bar_qs) + ' DIV ADD = ' + data_dir + 'Figures/interface_ratio.grd'))
+time.sleep(5)
+
+fig5 = pygmt.Figure()
+fig5.grdimage((data_dir + 'Figures/interface_ratio.grd'),
+            cmap=data_dir + 'Figures/qs_ratio.cpt',
+            projection='x0.03/0.075',
+            region=[-125.0,230.0,-80.0,-15.0],
+            interpolation='n')
+fig5.grdcontour(grid=(data_dir + 'Figures/interface_ratio.grd'),
+            interval=data_dir + 'Figures/qs_ratio.cpt',
+            annotation="0.25+f7p",
+            projection='x0.03/0.075',
+            region=[-125.0,230.0,-80.0,-15.0],
+            pen='0.23,black')
+fig5.basemap(projection='x0.03/0.075',
+            region=[-125.0,230.0,-80.0,-15.0],
+            frame=['WSte','xa50f25+l"Distance Along Strike (km)"','ya10f5+l"Slab Depth (km)"']
+            )
+fig5.basemap(projection='x3.33/0.075',
+            region=[-32.7,-29.5,-80.0,-15.0],
+            frame=['lbNr','xa1f0.5+l"Latitude (deg)"'])
+fig5.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots_ratio.txt+L"Qs Ratio"'],
+                cmap=data_dir + 'Figures/qs_ratio.cpt',
+                position='JMR+o0.5c/0c+w4.92c/0.4c+e+n"No Data"')
+fig5.savefig((data_dir + 'Figures/interface_ratio.png'))
