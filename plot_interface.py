@@ -43,6 +43,11 @@ for row in range(len(slab_contours)):
     unique_lons = np.unique(qs_model['lon'])
     unique_lats = np.unique(qs_model['lat'])
     unique_deps = np.unique(qs_model['dep'])
+
+    # The purpose of this if is to ensure that the box closest to the point
+    # on the slab contour is the box just above the interface, not below,
+    # so that we don't capture high Qs from the slab which might be 
+    # mistake for a high Qs anomaly on the interface.
     if dep < -3.0:
         unique_deps = unique_deps[np.where(unique_deps >= dep)]
 
