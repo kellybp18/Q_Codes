@@ -77,7 +77,7 @@ interface.to_csv(data_dir + 'Figures/interface_qs.csv',index=False)
 # Calculate distance along fault surface for coords of the Okuwaki 2016 radiation pattern track
 # and project onto the interface
 
-interface_rad_pattern = pd.DataFrame({'dist_along_strike':[],'slab_depth':[]})
+interface_rad_pattern = pd.DataFrame({'lat':[],'slab_depth':[]})
 for coord in range(len(rad_pattern)):
     rad_lon = rad_pattern['lon'][coord]
     rad_lat = rad_pattern['lat'][coord]
@@ -86,12 +86,11 @@ for coord in range(len(rad_pattern)):
     slab_lats = np.array(interface['lat'])
 
     find_coord_index = np.argmin(np.abs(rad_lon - slab_lons) + np.abs(rad_lat - slab_lats))
-    rad_dist = interface['dist_along_strike'][find_coord_index]
     rad_dep = interface['slab_depth'][find_coord_index]
 
-    print(interface['lon'][find_coord_index],interface['lat'][find_coord_index],rad_dist,rad_dep)
+    print(interface['lon'][find_coord_index],interface['lat'][find_coord_index],rad_dep)
     
-    interface_rad_pattern = interface_rad_pattern.append({'dist_along_strike': rad_dist, 'slab_depth': rad_dep},ignore_index=True)
+    interface_rad_pattern = interface_rad_pattern.append({'lat': rad_lat, 'slab_depth': rad_dep},ignore_index=True)
 
 interface_rad_pattern.to_csv(data_dir + 'Figures/interface_rad_pattern.csv',index=False)
 
@@ -235,15 +234,15 @@ for t in np.array([[0,5],[6,10],[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],
                 y=np.array([-31.0]),
                 projection='x0.03/0.075',
                 region=[-125.0,230.0,-80.0,-15.0],
-                style='a0.3',
+                style='a0.5',
                 color='yellow',
-                pen='0.1p,black'
+                pen='1.0p,black'
                 )
-    # fig2.plot(data=(data_dir+'Figures/interface_rad_pattern.csv'),
-    #             projection='x0.02/0.06',
-    #             region=[-125.0,250.0,-80.0,-15.0],
-    #             pen='thick,red'
-    #             )
+    fig2.plot(data=(data_dir+'Figures/interface_rad_pattern.csv'),
+                projection='x3.33/0.075',
+                region=[-32.7,-29.5,-80.0,-15.0],
+                pen='thick,red'
+                )
     if t1 == -1 and t2 == -1:
         fig2.plot(data=(data_dir + 'Figures/okuwaki_rad_pattern/total_highmag_rad.csv'),
                 projection='x3.33/0.075',
@@ -333,9 +332,9 @@ fig3.plot(x=np.array([0.0]),
             y=np.array([-31.0]),
             projection='x0.03/0.075',
             region=[-125.0,230.0,-80.0,-15.0],
-            style='a0.3',
+            style='a0.5',
             color='yellow',
-            pen='0.1p,black'
+            pen='1.0p,black'
             )
 fig3.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots.txt+LQs'],
                 cmap=data_dir + 'Figures/qs.cpt',
@@ -379,9 +378,9 @@ for idx,timestr in enumerate(time_file_strs):
                 y=np.array([-31.0]),
                 projection='x0.03/0.075',
                 region=[-125.0,230.0,-80.0,-15.0],
-                style='a0.3',
+                style='a0.5',
                 color='yellow',
-                pen='0.2p,black'
+                pen='1.0p,black'
                 )
     fig4.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots.txt+LQs'],
                     cmap=data_dir + 'Figures/qs.cpt',
