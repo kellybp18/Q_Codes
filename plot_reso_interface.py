@@ -14,7 +14,7 @@ import time
 
 map_coords = np.array([-73.0,-68.0,-34.0,-29.0])
 data_dir = '/Volumes/External/Resolution_Tests/Latbox_49_Lonbox_46_Depbox_40/'
-structure = 'bar'
+structure = 'inverted_bar'
 
 # Set up area
 latmin = -33.0
@@ -185,6 +185,14 @@ fig5.basemap(projection='x0.03/0.075',
 fig5.basemap(projection='x3.33/0.075',
             region=[-32.7,-29.5,-80.0,-15.0],
             frame=['lbNr','xa1f0.5+l"Latitude (deg)"'])
+fig5.plot(x=np.array([0.0]),
+                y=np.array([-31.0]),
+                projection='x0.03/0.075',
+                region=[-125.0,230.0,-80.0,-15.0],
+                style='a0.5',
+                color='yellow',
+                pen='1.0p,black'
+                )
 fig5.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots_ratio.txt+L"Qs Ratio"'],
                 cmap=data_dir + 'Figures/qs_ratio.cpt',
                 position='JMR+o0.5c/0c+w4.92c/0.4c+e+n"No Data"')
