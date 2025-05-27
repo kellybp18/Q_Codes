@@ -14,7 +14,7 @@ import time
 
 map_coords = np.array([-73.0,-68.0,-34.0,-29.0])
 data_dir = '/Volumes/External/Resolution_Tests/Latbox_49_Lonbox_46_Depbox_40/'
-structure = 'bar'
+structure = 'inverted_bar'
 
 lonmin = -73.0
 lonmax = -69.0
@@ -306,7 +306,14 @@ for i in uniqdeps:
               pen='1.3p,black',
               style='f1.4c/0.3c+l+t+p',
               color='black')
-    fig5.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots_ratio.txt+L"Qs Ratio"'],
+    fig5.plot(data='/Users/bpk/Documents/BPK_Masters_2019/Illapel_Events/main_shock.loc',
+              projection='m3.5c',
+              region=[lonmin,lonmax,latmin,latmax],
+              style='a0.4',
+              color='yellow',
+              pen='thin,black',
+              incols=[1,0])
+    fig5.colorbar(frame=['xc' + data_dir + 'Figures/cbar_annots_ratio.txt+l"Qs Ratio"'],
                  cmap=data_dir + 'Figures/qs_ratio.cpt',
                  position='JMR+o0.75c/0c+w7c/0.5c+e+n"No Data"')
     fig5.savefig((data_dir + 'Figures/depratio_'+str(dep_round)+'.png'))
