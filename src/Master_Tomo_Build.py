@@ -1,8 +1,20 @@
+# Creates a 3D tomography of the 2015 Illapel earthquake rupture region. Uses input file
+# "qs_database.csv", which includes the along-path Qs measured for each source-receiver
+# ray path, to invert for the Qs structure in a 3D grid. Output file "qs_model.csv" includes 
+# box number, spatial characteristics, and associated Qs.
+#
+# Change variables "Nblocks_lat", "Nblocks_lon", and "Nblocks_dep" to change model resolution.
+
 import numpy as np
 import numpy.linalg as linalg
 import scipy.optimize as sciop
 import pandas as pd
 import re
+
+from pathlib import Path
+
+base_dir = Path(__file__).resolve().parent.parent
+data_dir = base_dir / "data"
 
 # DEFINE GRID
 LAT_NORTH = -29.0
@@ -92,14 +104,14 @@ for i,dep in enumerate(deprange[:-1]):
 
             boxnum = boxnum + 1
 
-boxpt.to_csv('/Volumes/External/Tomography/boxpt.csv',index=False)
-# boxpt = pd.read_csv('/Volumes/External/Tomography/boxpt.csv')
+boxpt.to_csv(data_dir / 'boxpt.csv',index=False)
+# boxpt = pd.read_csv(data_dir / 'boxpt.csv')
 
 # CREATE VELOCITY MODEL MATRIX (uncomment block if you need to create it)
 velo_model = pd.DataFrame({'box_num':[],'p_velo':[],'s_velo':[],'num_pts_averaged':[]})
 
-p_velmod = pd.read_csv('/Users/bpk/Documents/BPK_Masters_2019/raytrace/Illapel_P_Velmod_New.csv',sep=',',dtype=float)
-s_velmod = pd.read_csv('/Users/bpk/Documents/BPK_Masters_2019/raytrace/Illapel_S_Velmod_New.csv',sep=',',dtype=float)
+p_velmod = pd.read_csv(data_dir / 'Illapel_P_Velmod_New.csv',sep=',',dtype=float)
+s_velmod = pd.read_csv(data_dir / 'Illapel_S_Velmod_New.csv',sep=',',dtype=float)
 
 p_velmod['vs'] = s_velmod['vs']
 # For each box in boxpt, average all points in the velocity models
@@ -116,13 +128,13 @@ for bnum in boxpt['box_num']:
     avgS = totvelS/vels_found
     velo_model = velo_model.append({'box_num':bnum,'p_velo':avgP,'s_velo':avgS,'num_pts_averaged':vels_found},ignore_index=True)
 
-velo_model.to_csv('/Volumes/External/Tomography/block_velo_model.csv',index=False)
-# velo_model = pd.read_csv('/Volumes/External/Tomography/block_velo_model.csv')
+velo_model.to_csv(data_dir / 'block_velo_model.csv',index=False)
+# velo_model = pd.read_csv(data_dir / 'block_velo_model.csv')
 
 # CREATE INITIAL Qs MODEL (uncomment block if you need to create it)
 m0 = np.zeros(len(boxpt['box_num']))
 
-init_qs_model = pd.read_csv('/Volumes/External/Tomography/Initial_Qs_Model.csv',sep=',',names=['Qlon_0','Qlat_0','Qdep_0','Q0'],dtype=float)
+init_qs_model = pd.read_csv(data_dir / 'Initial_Qs_Model.csv',sep=',',names=['Qlon_0','Qlat_0','Qdep_0','Q0'],dtype=float)
 
 # For each box in boxpt, average all points in the initial Q model
 # that fit into the box dimensions.
@@ -137,11 +149,11 @@ for bnum in boxpt['box_num']:
     avgQ = totQ/numQs
     m0[bnum-1] = 1/avgQ
 
-np.savetxt('/Volumes/External/Tomography/m0.txt',m0)
-# m0 = np.loadtxt('/Volumes/External/Tomography/m0.txt')
+np.savetxt(data_dir / 'm0.txt',m0)
+# m0 = np.loadtxt(data_dir / m0.txt')
 
 # READ INPUT FILE; PREPARE T*, COVARIANCE T* (Cd), INVERSE COV T* (CdI), AND COORDS ARRAYS
-all_rays = pd.read_csv('/Volumes/External/Attenuation/q_database.csv')
+all_rays = pd.read_csv(data_dir / 'q_database.csv')
 all_good_rays = pd.DataFrame(all_rays[all_rays['judge_result'] == 'GOOD'])
 all_good_rays = all_good_rays.reset_index(drop=True)
 assert len(all_good_rays) == 3852
@@ -168,7 +180,7 @@ for o,event_id in enumerate(all_good_rays['ev_id']):
     # Find GMT file
     event_number = str(np.where(event_list == event_id)[0][0]+1)
     station = all_good_rays['stn_id'][o]
-    rayfile = '/Users/bpk/Documents/BPK_Masters_2019/raytrace/Illapel_GMT_Files/E' + event_number + '-' + station + '.gmt'
+    rayfile = data_dir / ('/Illapel_GMT_Files/E' + event_number + '-' + station + '.gmt')
     print('Working on ray E' + event_number + '-' + station)
     rayfile_list = open(rayfile,'r')
 
@@ -216,8 +228,8 @@ for o,event_id in enumerate(all_good_rays['ev_id']):
                                 'R':r_new,'theta_deg':thetad_new,'theta_rad':thetar_new,'phi_deg':phid_new, \
                                 'phi_rad':phir_new,'X':X_new,'Y':Y_new,'Z':Z_new},ignore_index=True)
 
-coords.to_csv('/Volumes/External/Tomography/coords.csv',index=False)
-# coords = pd.read_csv('/Volumes/External/Tomography/coords.csv')
+coords.to_csv(data_dir / 'coords.csv',index=False)
+# coords = pd.read_csv(data_dir / 'coords.csv')
 
 # MAKE DIST ARRAY (uncomment block if you need to create it)
 dist = np.zeros((NBLOCKS,len(all_good_rays)))
@@ -689,16 +701,7 @@ for r in range(len(coords['ray_num'])-1):
     elif ray1 != ray2:
         continue
 
-np.savetxt('/Volumes/External/Tomography/dist.txt',dist)
-# print('GO')
-# chunk = 0
-# dist_pd = pd.DataFrame()
-# for dist_tfr in pd.read_table('/Volumes/External/Tomography/dist.txt',sep=' ',header=None,chunksize=1000,iterator=True):
-#     chunk = chunk + 1
-#     dist_pd = pd.concat([dist_pd,dist_tfr],ignore_index=True)
-# dist_pd.head()
-# dist = dist_pd.to_numpy()
-# dist = np.loadtxt('/Volumes/External/Tomography/dist.txt')
+np.savetxt(data_dir / 'dist.txt',dist)
 
 # MAKE TRAVEL TIME ARRAY TT_SP
 tt_sp = np.zeros((len(all_good_rays),NBLOCKS))
@@ -758,8 +761,8 @@ for j in range(Nblocks_lat):
             rown = rown + 1
             print('Working on row',rown,'out of',(Nblocks_lat*Nblocks_lon*(Nblocks_dep-2)))
 
-#np.savetxt('/Volumes/External/Tomography/dr.txt',dr)
-#dr = np.loadtxt('/Volumes/External/Tomography/dr.txt')
+#np.savetxt(data_dir / 'dr.txt',dr)
+#dr = np.loadtxt(data_dir / 'dr.txt')
 
 # Populate DTHETA matrix
 rown = 0
@@ -775,8 +778,8 @@ for k in range(Nblocks_lon):
             rown = rown + 1
             print('Working on row',rown,'out of',((Nblocks_lat-2)*Nblocks_lon*Nblocks_dep))
 
-#np.savetxt('/Volumes/External/Tomography/dtheta.txt',dtheta)
-#dtheta = np.loadtxt('/Volumes/External/Tomography/dtheta.txt')
+#np.savetxt(data_dir / 'dtheta.txt',dtheta)
+#dtheta = np.loadtxt(data_dir / 'dtheta.txt')
 
 # Populate DPHI matrix
 rown = 0
@@ -792,8 +795,8 @@ for i in range(Nblocks_dep):
             rown = rown + 1
             print('Working on row',rown,'out of',(Nblocks_lat*(Nblocks_lon-2)*Nblocks_dep))
 
-#np.savetxt('/Volumes/External/Tomography/dphi.txt',dphi)
-#dphi = np.loadtxt('/Volumes/External/Tomography/dphi.txt')
+#np.savetxt(data_dir / 'dphi.txt',dphi)
+#dphi = np.loadtxt(data_dir / 'dphi.txt')
 
 ttsp2 = tt_sp
 
@@ -828,16 +831,14 @@ for column in cols2rm:
     ttsp2 = np.delete(ttsp2,column,1)
     m0_mod = np.delete(m0_mod,column)
 
-# print('Done')
-
-np.savetxt('/Volumes/External/Tomography/g_mod.txt',g_mod)
-np.savetxt('/Volumes/External/Tomography/ttsp2.txt',ttsp2)
-np.savetxt('/Volumes/External/Tomography/m0_mod.txt',m0_mod)
-np.savetxt('/Volumes/External/Tomography/rmlist.txt',rmlist)
-# g_mod = np.loadtxt('/Volumes/External/Tomography/g_mod.txt')
-# ttsp2 = np.loadtxt('/Volumes/External/Tomography/ttsp2.txt')
-# m0_mod = np.loadtxt('/Volumes/External/Tomography/m0_mod.txt')
-# rmlist = np.loadtxt('/Volumes/External/Tomography/rmlist.txt')
+np.savetxt(data_dir / 'g_mod.txt',g_mod)
+np.savetxt(data_dir / 'ttsp2.txt',ttsp2)
+np.savetxt(data_dir / 'm0_mod.txt',m0_mod)
+np.savetxt(data_dir / 'rmlist.txt',rmlist)
+# g_mod = np.loadtxt(data_dir / 'g_mod.txt')
+# ttsp2 = np.loadtxt(data_dir / 'ttsp2.txt')
+# m0_mod = np.loadtxt(data_dir / 'm0_mod.txt')
+# rmlist = np.loadtxt(data_dir / 'rmlist.txt')
 # cols2rm = np.flip(rmlist)
 
 print(np.shape(g_mod))
@@ -860,9 +861,9 @@ for i,m_param in enumerate(m0_mod):
 #g_mod = g_mod.astype(np.float64)
 print('Starting svd')
 Up,Lp,Vp = linalg.svd(g_mod,full_matrices=False)
-np.savetxt('/Volumes/External/Tomography/up.txt',Up)
-np.savetxt('/Volumes/External/Tomography/lp.txt',Lp)
-np.savetxt('/Volumes/External/Tomography/vp.txt',Vp)
+np.savetxt(data_dir / 'up.txt',Up)
+np.savetxt(data_dir / 'lp.txt',Lp)
+np.savetxt(data_dir / 'vp.txt',Vp)
 print('Done with svd')
 
 # Make diagonal matrix of inverse singular values
@@ -877,7 +878,6 @@ print(np.shape(Hp),np.shape(hp))
 
 Gp = np.transpose(np.concatenate((Hp,hp),axis=1))
 dp = np.append(np.zeros(len(Hp[0,:])),[1])
-print('we are here')
 print(np.shape(Gp),np.shape(dp))
 mpp = sciop.nnls(Gp,dp,maxiter=4*Gp.shape[1])[0]
 
@@ -918,4 +918,5 @@ for i in range(NBLOCKS):
     q_model = q_model.append({'box_num':block_num,'R':avg_R,'theta':avg_theta_rad,'phi':avg_phi_rad,'lon':avg_lon, \
                               'lat':avg_lat,'dep':avg_dep,'Qs':blockQ}, ignore_index = True)
 
-q_model.to_csv('/Volumes/External/Tomography/qs_model.csv',index=False)
+q_model.to_csv(data_dir / 'qs_model.csv',index=False)
+
