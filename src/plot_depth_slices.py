@@ -59,7 +59,7 @@ for j in range(len(dist[:,0])):
 hitcounts.to_csv(data_dir / 'hitcounts.csv',index=False)
 #hitcounts = pd.read_csv(data_dir / 'hitcounts.csv')
 
-os.system('cd ' + (data_dir / 'Figures'))
+os.system('cd ' + str(fig_dir))
 
 for i in uniqdeps:
     lonmin = -73.0
@@ -95,7 +95,7 @@ for i in uniqdeps:
     # Get data for station plotting
 
     surf_data = pd.DataFrame(depslice.loc[:,['lon','lat','Qs']])
-    surf_data.to_csv((data_dir / 'surfdepgrid_'+str(dep_round)+'.xyz'),header=None,index=None,sep=' ',mode='w')
+    surf_data.to_csv(data_dir / ('surfdepgrid_'+str(dep_round)+'.xyz'),header=None,index=None,sep=' ',mode='w')
 
     os.system(('gmt blockmean ' + str(data_dir) + '/surfdepgrid_'+str(dep_round)+'.xyz -R-73/-68/-34/-29 -I'+str(surflonstep)+'/'+str(surflatstep)+' > ' + str(data_dir) + '/surfdepgridmed_'+str(dep_round)+'.xyz'))
     time.sleep(3)
@@ -139,7 +139,7 @@ for i in uniqdeps:
     fig.colorbar(frame=['xc' + str(data_dir) + '/cbar_annots.txt+LQs'],
                  cmap=data_dir / 'qs.cpt',
                  position='JMR+o0.75c/0c+w7c/0.5c+n"No Data"')
-    fig.savefig((str(data_dir) + '/dep_'+str(-1*dep_round)+'_slice.png'))
+    fig.savefig((str(fig_dir) + '/dep_'+str(-1*dep_round)+'_slice.png'))
 
     lonmin = -73.5
 
@@ -149,7 +149,7 @@ for i in uniqdeps:
               water='darkgray')
     fig2.grdimage((str(data_dir) + '/surfdepgridclip_'+str(dep_round)+'.grd'),
                 projection='m3.5c',
-                cmap=data_dir + 'qs_surf.cpt',
+                cmap=data_dir / 'qs_surf.cpt',
                 region=[lonmin,lonmax,latmin,latmax],
                 interpolation='n')
     fig2.grdcontour(grid=(str(data_dir) + '/surfdepgridclip_'+str(dep_round)+'.grd'),
@@ -200,7 +200,7 @@ for i in uniqdeps:
     fig2.colorbar(frame=['xc' + str(data_dir) + '/cbar_annots.txt+LQs'],
                  cmap=data_dir / 'qs.cpt',
                  position='JMR+o0.75c/0c+w7c/0.5c+n"No Data"')
-    fig2.savefig((str(data_dir) + '/dep_'+str(dep_round)+'_slice_surf.png'))
+    fig2.savefig((str(fig_dir) + '/dep_'+str(dep_round)+'_slice_surf.png'))
 
     lonmin = -73.0
 
@@ -243,4 +243,4 @@ for i in uniqdeps:
               region=[lonmin,lonmax,latmin,latmax])
     fig3.colorbar(frame=['x+l"Sum of Ray Distances in Box"','y+lkm'],
                  position='JMR+o0.75c/0c+w7c/0.5c')
-    fig3.savefig((str(data_dir) + '/dep_'+str(dep_round)+'_hitcounts_.png'))
+    fig3.savefig((str(fig_dir) + '/dep_'+str(dep_round)+'_hitcounts_.png'))
