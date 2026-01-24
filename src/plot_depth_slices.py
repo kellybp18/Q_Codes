@@ -181,12 +181,6 @@ for i in uniqdeps:
               color='white',
               pen='thin,black',
               incols=[1,0])
-    fig2.plot(data=data_dir / 'volcanos.gmt',
-              projection='m3.5c',
-              region=[lonmin,lonmax,latmin,latmax],
-              style='t0.4',
-              color='indianred2',
-              pen='thin,black')
     fig2.plot(data=data_dir / 'offshore_fault_coords_no_coast.txt',
               projection='m3.5c',
               region=[lonmin,lonmax,latmin,latmax],
