@@ -132,22 +132,24 @@ velo_model.to_csv(data_dir / 'block_velo_model.csv',index=False)
 # velo_model = pd.read_csv(data_dir / 'block_velo_model.csv')
 
 # CREATE INITIAL Qs MODEL (uncomment block if you need to create it)
-m0 = np.zeros(len(boxpt['box_num']))
+m0 = (1/450)*np.ones(NBLOCKS)
 
-init_qs_model = pd.read_csv(data_dir / 'Initial_Qs_Model.csv',sep=',',names=['Qlon_0','Qlat_0','Qdep_0','Q0'],dtype=float)
+# m0 = np.zeros(len(boxpt['box_num']))
+
+# init_qs_model = pd.read_csv(data_dir / 'Initial_Qs_Model.csv',sep=',',names=['Qlon_0','Qlat_0','Qdep_0','Q0'],dtype=float)
 
 # For each box in boxpt, average all points in the initial Q model
 # that fit into the box dimensions.
-for bnum in boxpt['box_num']:
-    bnum = int(bnum)
-    print('Working on box #',bnum,'in m0 array.')
-    dep_sort = init_qs_model[(init_qs_model['Qdep_0'] <= -1*boxpt['dep_max'][bnum-1]) & (init_qs_model['Qdep_0'] >= -1*boxpt['dep_min'][bnum-1])]
-    lat_sort = dep_sort[(dep_sort['Qlat_0'] <= boxpt['lat_max'][bnum-1]) & (dep_sort['Qlat_0'] >= boxpt['lat_min'][bnum-1])]
-    lon_sort = lat_sort[(lat_sort['Qlon_0'] <= boxpt['lon_max'][bnum-1]) & (lat_sort['Qlon_0'] >= boxpt['lon_min'][bnum-1])]
-    totQ = sum(lon_sort['Q0'])
-    numQs = len(lon_sort['Q0'])
-    avgQ = totQ/numQs
-    m0[bnum-1] = 1/avgQ
+# for bnum in boxpt['box_num']:
+    # bnum = int(bnum)
+    # print('Working on box #',bnum,'in m0 array.')
+    # dep_sort = init_qs_model[(init_qs_model['Qdep_0'] <= -1*boxpt['dep_max'][bnum-1]) & (init_qs_model['Qdep_0'] >= -1*boxpt['dep_min'][bnum-1])]
+    # lat_sort = dep_sort[(dep_sort['Qlat_0'] <= boxpt['lat_max'][bnum-1]) & (dep_sort['Qlat_0'] >= boxpt['lat_min'][bnum-1])]
+    # lon_sort = lat_sort[(lat_sort['Qlon_0'] <= boxpt['lon_max'][bnum-1]) & (lat_sort['Qlon_0'] >= boxpt['lon_min'][bnum-1])]
+    # totQ = sum(lon_sort['Q0'])
+    # numQs = len(lon_sort['Q0'])
+    # avgQ = totQ/numQs
+    # m0[bnum-1] = 1/avgQ
 
 np.savetxt(data_dir / 'm0.txt',m0)
 # m0 = np.loadtxt(data_dir / m0.txt')
@@ -919,4 +921,5 @@ for i in range(NBLOCKS):
                               'lat':avg_lat,'dep':avg_dep,'Qs':blockQ}, ignore_index = True)
 
 q_model.to_csv(data_dir / 'qs_model.csv',index=False)
+
 
