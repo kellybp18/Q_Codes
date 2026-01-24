@@ -22,8 +22,6 @@ depmax = -72
 
 q_database = pd.read_csv(data_dir / 'q_database.csv')
 qs_model = pd.read_csv(data_dir / 'qs_model.csv')
-elev_data = pd.read_table(data_dir / 'Illapel_topo15.xyz',sep='\t',dtype=float,names=['lon','lat','elev'])
-stn_data = pd.read_table(data_dir / 'Illapel_Stns.gmt',sep=' ',dtype=float,usecols=[0,1,2],names=['lat','lon','elev'])
 qs_initial_model = (1/450)*np.ones(num_boxes)
 
 qs_model.loc[(qs_model['Qs'] > 0.0) & (qs_model['Qs'] < 75.0),'Qs'] = 75.0
