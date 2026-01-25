@@ -1,5 +1,5 @@
 # Plots various relationships between Qs and other variables,
-# statistical relationships, histograms, etc. from "q_database.csv".
+# statistical relationships, etc. from "q_database.csv".
 
 import numpy as np
 import pandas as pd
@@ -81,38 +81,8 @@ plt.title('Histogram of Higher Freq. Band Limit Picks')
 plt.savefig(fig_dir / 't7_t8_histograms.png')
 plt.show()
 
-# Histogram of stdev
-plt.figure('fig5')
-stdev_bins = np.linspace(0,7500,151)
-plt.hist(q_database['stdev_qs'],bins=stdev_bins,color='cyan',edgecolor='black')
-plt.xlabel('Standard Deviation of Qs')
-plt.ylabel('Number of Rays')
-plt.title('Histogram of Standard Deviation of Qs')
-plt.savefig(fig_dir / 'stdev_histogram.png')
-plt.show()
-
-# Histogram of Mean Qs
-plt.figure('fig6')
-mean_qs_bins = np.linspace(75,1500,15)
-plt.hist(good_data['mean_qs'],bins=mean_qs_bins,color='cyan',edgecolor='black')
-plt.xlabel('Mean Qs')
-plt.ylabel('Number of Rays')
-plt.title('Histogram of Mean Qs')
-plt.savefig(fig_dir / 'Mean_Qs_histogram.png')
-plt.show()
-
-# Histogram of Stacked Qs
-plt.figure('fig7')
-mean_qs_bins = np.linspace(75,1500,15)
-plt.hist(good_data['stacked_qs'],bins=mean_qs_bins,color='cyan',edgecolor='black')
-plt.xlabel('Stacked Qs')
-plt.ylabel('Number of Rays')
-plt.title('Histogram of Stacked Qs')
-plt.savefig(fig_dir / 'Stacked_Qs_histogram.png')
-plt.show()
-
 # Standard Deviation of Qs vs. Mean Qs
-plt.figure('fig8')
+plt.figure('fig5')
 linefit_coeffs = np.polyfit(good_data['mean_qs'],good_data['stdev_qs'],1)
 print('Linear regression line is y =',linefit_coeffs[0],'* x +',linefit_coeffs[1])
 linefit_y_hats = np.polyval(linefit_coeffs,good_data['mean_qs'])
@@ -122,5 +92,5 @@ plt.xlabel('Mean Qs')
 plt.ylabel('Standard Deviation of Qs')
 plt.title('Standard Deviation of Qs vs. Mean Qs')
 plt.legend()
-plt.savefig('/Volumes/External/Attenuation/Figures/Mean_Qs_vs_stdev.png')
+plt.savefig(fig_dir / 'Mean_Qs_vs_stdev.png')
 plt.show()
