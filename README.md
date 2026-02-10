@@ -2,7 +2,7 @@
 
 This repository contains the scripts and input files needed to create the 3D shear wave quality factor ($Q_{S}$) attenuation tomography for the 2015 $M_{w}$ Illapel earthquake rupture region, found in "Attenuation Tomographic Mapping of Interplate Asperities in the Rupture Region of the 2015 $M_{w}$ 8.3 Illapel, Chile, Earthquake" by Brian P. Kelly and Raymond M. Russo.
 
-**Citation:** Brian P Kelly, R M Russo, Attenuation Tomographic Mapping of Interplate Asperities in the Rupture Region of the 2015 𝑀W 8.3 Illapel, Chile, Earthquake, Geophysical Journal International, 2026;, ggag041, https://doi.org/10.1093/gji/ggag041
+**Citation:** Brian P Kelly, R M Russo, Attenuation Tomographic Mapping of Interplate Asperities in the Rupture Region of the 2015 $M_{w}$ 8.3 Illapel, Chile, Earthquake, _Geophysical Journal International_, 2026;, ggag041, https://doi.org/10.1093/gji/ggag041
 
 
 # How To Use
