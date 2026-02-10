@@ -2,8 +2,26 @@
 
 This repository contains the scripts and input files needed to create the 3D shear wave quality factor ($Q_{S}$) attenuation tomography for the 2015 $M_{w}$ Illapel earthquake rupture region, found in "Attenuation Tomographic Mapping of Interplate Asperities in the Rupture Region of the 2015 $M_{w}$ 8.3 Illapel, Chile, Earthquake" by Brian P. Kelly and Raymond M. Russo.
 
-**Citation:** Brian P Kelly, R M Russo, Attenuation Tomographic Mapping of Interplate Asperities in the Rupture Region of the 2015 $M_{w}$ 8.3 Illapel, Chile, Earthquake, _Geophysical Journal International_, 2026;, ggag041, https://doi.org/10.1093/gji/ggag041
+**Citation:** B P Kelly, R M Russo, Attenuation Tomographic Mapping of Interplate Asperities in the Rupture Region of the 2015 $M_{w}$ 8.3 Illapel, Chile, Earthquake, _Geophysical Journal International_, 2026;, ggag041, https://doi.org/10.1093/gji/ggag041
 
+**_Please Note:_** The 3D tomography code was built to run on relatively powerful machines. The resolution achieved in the article required the use of supercomputing resources for speed and sufficient RAM. In its form in this repository, the default resolution may not complete on machines with less then 32 GB of RAM. For machines with less RAM, increasing the box size (and thus, decreasing the resolution) may be necessary.
+
+# Dependencies
+
+To execute the scripts included in this repository, you will need a Python compiler, version 3.6 or later. A convenient option is to use an environment manager like Miniconda, which will allow you to install external Python packages, prevent dependency conflicts, and compile Python code.
+
+**Miniconda:** https://www.anaconda.com/docs/getting-started/miniconda/main
+
+**Using conda:** https://www.anaconda.com/docs/getting-started/working-with-conda/main
+
+You will need to install the latest versions of the following packages:
+
+* Numpy
+* Pandas
+* Matplotlib
+* Scipy
+
+**IMPORTANT:** You will also need to unzip the "Illapel_GMT_Files.zip" file in the "/data" directory, and ensure the extracted folder "Illapel_GMT_Files" is located in the same directory. The main 3D tomography code will fail to run without completing this step.
 
 # How To Use
 
@@ -16,3 +34,5 @@ The repository contains three scripts:
 **Master_Analysis.py:** This script plots various relationships between variables relevant to the along-path $Q_{S}$ data used in the inversion. 
 
 **q_database_stats.py:** This script creates correlation matrices of $Q_{S}$ and other variables, and histograms of along-path $Q_{S}$ and $Q_{S}$ in the 3D tomography.
+
+Master_Analysis.py can be run right away, but q_database_stats.py depends on the "qs_model.csv" output from Master_Tomo_Build.py to execute.
