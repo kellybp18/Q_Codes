@@ -8,6 +8,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
 
+from pathlib import Path
+
+base_dir = Path(__file__).resolve().parent.parent
+data_dir = base_dir / "data"
+fig_dir = base_dir / "figures"
+
 q_database = pd.read_csv(data_dir / 'q_database.csv')
 qs_model = pd.read_csv(data_dir / 'qs_model.csv')
 
